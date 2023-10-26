@@ -30,9 +30,10 @@ class Watchytchi : public WatchyBase{
         void tickCreatureState();
         TimeOfDay getTimeOfDay();
         TimeOfDay getTimeOfDay(const tmElements_t &tm);
-        float getHappyPercent();
+        float getHappyPercent(bool shouldConstrain = true);
         HappyTier getHappyTier();
         HappyTier getHappyTier(float happyPercent);
+        bool isUnhappinessIncreasing();
         bool qualifiesForBadEnd();
         bool isElectricLit();
         bool hasActivePlaymate();

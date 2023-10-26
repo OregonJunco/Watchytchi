@@ -435,7 +435,7 @@ void Watchytchi::tickCreatureState()
   DBGPrintF(", lastHappyDelta is "); DBGPrint(lastHappyDelta); DBGPrintln();
 
   /*# Tick running away #*/
-  auto isContemplatingRunAway = getHappyPercent() <= 0.f && lastHappyDelta < 0; // TODO: get lastHappyDelta working
+  auto isContemplatingRunAway = getHappyPercent() <= 0.f && isUnhappinessIncreasing();
 
   // Offer a buffer "shield" that ticks up first before you get permanent run away points
   const int k_shieldSecondsSize = 30 * 60;
@@ -444,9 +444,12 @@ void Watchytchi::tickCreatureState()
   if (isContemplatingRunAway && badEndShieldSeconds >= k_shieldSecondsSize)
     badEndSeconds += timeDelta;
   // The bad end meter can go down just a tad if you're happy and hovering at the edge
-  if (getHappyPercent() >= 0.9f && badEndSeconds > k_secondsThresholdForBadEnd - 4 * 60 * 60)
+  if (getHappyTier() == HappyTier::Blissful && badEndSeconds > k_secondsThresholdForBadEnd * 0.8f)
     badEndSeconds -= timeDelta;
-  DBGPrintF("Bad end seconds: "); DBGPrint(badEndSeconds); DBGPrintF(", shield seconds is "); DBGPrint(badEndShieldSeconds); DBGPrintln();
+  // Non-adults can't run away, so clamp if I'm a teen
+  if (species == CreatureSpecies::Deer)
+    badEndSeconds = constrain(badEndSeconds, 0, k_secondsThresholdForBadEnd * 0.8f);
+  DBGPrintF("Contemplating RunAway? "); DBGPrint(isContemplatingRunAway); DBGPrintF(". Bad end seconds: "); DBGPrint(badEndSeconds); DBGPrintF(", shield seconds is "); DBGPrint(badEndShieldSeconds); DBGPrintln();
 
   /*# Atrophy poop: #*/
   if (!hasPoop && getTimeOfDay() != TimeOfDay::LateNight && (lastPoopHour == -1 || currentTime.Hour >= lastPoopHour + 4 || currentTime.Hour < lastPoopHour) 
@@ -479,10 +482,14 @@ TimeOfDay Watchytchi::getTimeOfDay(const tmElements_t &tm)
 }
 
 
-float Watchytchi::getHappyPercent()
+float Watchytchi::getHappyPercent(bool shouldConstrain)
 {
-  return constrain(foodHappy.value + strokeHappy.value + walkHappy.value 
-    + poopHappy.value + sleepHappy.value + playmateHappy.value, 0, 1);
+  auto rawSum = foodHappy.value + strokeHappy.value + walkHappy.value 
+    + poopHappy.value + sleepHappy.value + playmateHappy.value;
+  if (shouldConstrain)
+    return constrain(rawSum, 0, 1);
+  else
+    return rawSum;
 }
 
 HappyTier Watchytchi::getHappyTier()
@@ -500,6 +507,11 @@ HappyTier Watchytchi::getHappyTier(float hPercent)
     return HappyTier::Neutral;
   
   return HappyTier::Sad;
+}
+
+bool Watchytchi::isUnhappinessIncreasing()
+{
+  return hunger <= 0.45f || hasPoop; 
 }
 
 bool Watchytchi::qualifiesForBadEnd()

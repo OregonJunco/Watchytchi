@@ -33,15 +33,19 @@ void DaisyHog::DrawStarvingPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 110, img_DaisyHog_VeryHungry1, 72, 55, getColor_fg());
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 110-16+7, idleIdx % 2 == 0 ? img_Emote_Hungry1 : img_Emote_Hungry2, 28, 19, getColor_fg());
+  if (owner->getHappyTier() == HappyTier::Sad && owner->isUnhappinessIncreasing())
+    owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 85, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void DaisyHog::DrawHungryPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 110, img_DaisyHog_Hungry1, 72, 55, getColor_fg());
+    if (owner->getHappyTier() == HappyTier::Sad && owner->isUnhappinessIncreasing())
+    owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 85, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void DaisyHog::DrawSadPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 110, idleIdx % 2 == 0 ? img_DaisyHog_Sulking1 : img_DaisyHog_Sulking2, 72, 55, getColor_fg());
-  if (lastHappyDelta < 0)
+  if (owner->isUnhappinessIncreasing())
     owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 85, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void DaisyHog::DrawTwitchAnimationPose(int idleIdx, bool isAnimating)
@@ -132,15 +136,19 @@ void MugSnake::DrawStarvingPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 97, img_MugSnake_VeryHungry, 72, 72, getColor_fg());
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 97, idleIdx % 2 == 0 ? img_Emote_Hungry1 : img_Emote_Hungry2, 28, 19, getColor_fg());
+  if (owner->getHappyTier() == HappyTier::Sad && owner->isUnhappinessIncreasing())
+    owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 95, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void MugSnake::DrawHungryPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 97, img_MugSnake_Hungry, 72, 72, getColor_fg());
+  if (owner->getHappyTier() == HappyTier::Sad && owner->isUnhappinessIncreasing())
+    owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 95, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void MugSnake::DrawSadPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 97, idleIdx % 2 == 0 ? img_MugSnake_Sulking1 : img_MugSnake_Sulking2, 72, 72, getColor_fg());
-  if (lastHappyDelta < 0)
+  if (owner->isUnhappinessIncreasing())
     owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 95, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void MugSnake::DrawTwitchAnimationPose(int idleIdx, bool isAnimating)
@@ -223,16 +231,20 @@ void DeerSlug::DrawAsleepPose(int idleIdx, bool isAnimating)
 void DeerSlug::DrawStarvingPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 110, img_DeerSlug_Starving, 72, 55, getColor_fg());
+    if (owner->getHappyTier() == HappyTier::Sad && owner->isUnhappinessIncreasing())
+    owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 100, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void DeerSlug::DrawHungryPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 110, img_DeerSlug_Hungry1, 72, 55, getColor_fg());
+    if (owner->getHappyTier() == HappyTier::Sad && owner->isUnhappinessIncreasing())
+    owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 100, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void DeerSlug::DrawSadPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 110, img_DeerSlug_Sad1, 72, 55, getColor_fg());
-  if (lastHappyDelta < 0)
-    owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 85, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
+  if (owner->isUnhappinessIncreasing())
+    owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36 + 25, 100, idleIdx % 2 == 0 ? img_Emote_Stormcloud1 : img_Emote_Stormcloud2, 28, 28, getColor_fg());
 }
 void DeerSlug::DrawTwitchAnimationPose(int idleIdx, bool isAnimating)
 {
