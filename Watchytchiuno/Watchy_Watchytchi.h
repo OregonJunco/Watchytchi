@@ -76,6 +76,10 @@ class Watchytchi : public WatchyBase{
         bool ending_handleButtonPress(uint64_t wakeupBit);
         void sharedWalk_draw();
         bool sharedWalk_handleButtonPress(uint64_t wakeupBit);
+        void activitySelect_draw();
+        bool activitySelect_handleButtonPress(uint64_t wakeupBit);
+        void hotSpringsTimer_draw();
+        bool hotSpringsTimer_handleButtonPress(uint64_t wakeupBit);
 
         
         typedef void (Watchytchi::*DrawFunc)();
@@ -86,7 +90,9 @@ class Watchytchi : public WatchyBase{
             &Watchytchi::stroking_draw, // STROKING
             &Watchytchi::howWasYourDay_draw, // HOW WAS YOUR DAY
             &Watchytchi::ending_draw, // ENDING
-            &Watchytchi::sharedWalk_draw // SHARED WALK
+            &Watchytchi::sharedWalk_draw, // SHARED WALK
+            &Watchytchi::activitySelect_draw, // ACTIVITY SELECT
+            &Watchytchi::hotSpringsTimer_draw // HOT SPRINGS TIMER
         };
 
         typedef bool (Watchytchi::*ButtonFunc)(long long unsigned int);
@@ -97,6 +103,8 @@ class Watchytchi : public WatchyBase{
             &Watchytchi::stroking_handleButtonPress, // STROKING
             &Watchytchi::howWasYourDay_handleButtonPress, // HOW WAS YOUR DAY
             &Watchytchi::ending_handleButtonPress, // ENDING
-            &Watchytchi::sharedWalk_handleButtonPress
+            &Watchytchi::sharedWalk_handleButtonPress, // SHARED WALK
+            &Watchytchi::activitySelect_handleButtonPress, // ACTIVITY SELECT
+            &Watchytchi::hotSpringsTimer_handleButtonPress // HOT SPRINGS TIMER
         };
 };

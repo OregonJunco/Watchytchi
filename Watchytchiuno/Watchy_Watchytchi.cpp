@@ -2,6 +2,7 @@
 #include "Watchy_Watchytchi.h"
 #include <stdlib.h>     //srand, rand
 #include "SpeciesCode.h"
+#include <cmath>
 
 const unsigned char *dk_nums [10] = {dk0, dk1, dk2, dk3, dk4, dk5, dk6, dk7, dk8, dk9};
 const unsigned char *foodBerry_stages[7] = {img_FoodBerry_Stage0, img_FoodBerry_Stage1, img_FoodBerry_Stage2, img_FoodBerry_Stage3, 
@@ -11,6 +12,8 @@ const unsigned char *foodBerry_stages[7] = {img_FoodBerry_Stage0, img_FoodBerry_
 const unsigned char* flower_stages[6] = { img_GrowingFlower1, img_GrowingFlower2, img_GrowingFlower3, 
   img_GrowingFlower4, img_GrowingFlower5, img_GrowingFlower6};
 const unsigned char *menu_reset_press_stages[4] = {img_MenuIcon_ResetSave_Active, img_MenuIcon_ResetSave_ActivePress1, img_MenuIcon_ResetSave_ActivePress2, img_MenuIcon_ResetSave_ActivePress3};
+const unsigned char *hotSpring_nums [10] = {img_HotSpringNum_0, img_HotSpringNum_1, img_HotSpringNum_2, img_HotSpringNum_3, img_HotSpringNum_4, img_HotSpringNum_5, img_HotSpringNum_6, img_HotSpringNum_7, img_HotSpringNum_8, img_HotSpringNum_9};
+const unsigned char *hotSpring_nums_inner [10] = {img_HotSpringNum_0_Inner, img_HotSpringNum_1_Inner, img_HotSpringNum_2_Inner, img_HotSpringNum_3_Inner, img_HotSpringNum_4_Inner, img_HotSpringNum_5_Inner, img_HotSpringNum_6_Inner, img_HotSpringNum_7_Inner, img_HotSpringNum_8_Inner, img_HotSpringNum_9_Inner};
 
 const float k_secDurationToFullyDepleteHunger = 4.f * 60.f * 60.f;
 const int k_maxSecondsDeltaForUpdate = 5 * 60;
@@ -250,7 +253,7 @@ void Watchytchi::resetSaveData()
   NVS.setInt(nvsKey_activePlaymate, activePlaymate, false);
   lastPlaymateJoinTs = -1;
   NVS.setInt(nvsKey_lastPlaymateJoinTs, lastPlaymateJoinTs, false);
-  emotionSelectIdx = 0;
+  submenuIdx = 0;
   hasExecutedEnding = false;
   auto didSave = NVS.commit();
 
@@ -464,6 +467,21 @@ void Watchytchi::tickCreatureState()
   {
     DBGPrintF("Chose not to poop! lastPoopHour = "); DBGPrint(lastPoopHour); DBGPrintF(", lastAnimateMinute = "); DBGPrint(lastAnimateMinute); DBGPrintln();
   }
+
+  // Tick hot springs timer
+  // TODO: move to state-specific tick function
+  if (gameState == GameState::HotSpringsTimer && isHotSpringsTimerPlaying)
+  {
+    auto wasHotSpringsTimerExpired = hotSpringsTimerSecsLeft <= 0;
+    hotSpringsTimerSecsLeft = max(0.f, hotSpringsTimerSecsLeft - timeDelta);
+    if (hotSpringsTimerSecsLeft <= 0 && !wasHotSpringsTimerExpired)
+    {
+      if (isHotSpringsTimerOnBreak)
+        scheduleVibration(3, 100);
+      else
+        scheduleVibration(5, 200);
+    }
+  }
 }
 
 TimeOfDay Watchytchi::getTimeOfDay()
@@ -598,12 +616,12 @@ void Watchytchi::drawUIButton(int idx, bool quickCursorUpdate)
       else 
         display.drawBitmap(xPos, yPos, img_MenuIcon_Alert_Inactive, 32, 32, iconColor);
     }
+    else if (idx == MENUIDX_ACTIVITY)
+      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Activity_Active : img_MenuIcon_Activity_Inactive, 32, 32, iconColor);
     else if (idx == MENUIDX_CLEAN)
       display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Clean_Active : img_MenuIcon_Clean_Inactive, 32, 32, iconColor);
     else if (idx == MENUIDX_LIGHT)
       display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Lights_Active : img_MenuIcon_Lights_Inactive, 32, 32, iconColor);
-    else if (idx == MENUIDX_WALK)
-      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Walk_Active : img_MenuIcon_Walk_Inactive, 32, 32, iconColor);
     else if (idx == MENUIDX_RESET)
     {
       if (idx != menuIdx)
@@ -934,12 +952,11 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
       invertColors = !invertColors;
       didPerformAction = true;
     }
-    // Enter Walking mode
-    if (menuIdx == MENUIDX_WALK)
-    {
-      bmaStepsAtWalkStart = sensor.getCounter();
-      lastStepsDuringWalkCount = 0;
-      gameState = GameState::SharedWalk;
+    // Enter activity submenu
+    if (menuIdx == MENUIDX_ACTIVITY)
+    { 
+      submenuIdx = 0;
+      gameState = GameState::ActivitySelection;
       didPerformAction = true;
     }
     // HACK: until we have a settings menu, resetting save data is an option from one of the 8 care buttons
@@ -958,13 +975,13 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
     showWatchFace(true);
     return true;
   }
-
+ 
   if (IS_KEY_CURSOR) {
     menuIdx = (menuIdx + 1) % 8;
     // Skip the alert icon if there is no active alert. Disallow certain care actions while it's night
     while ((!hasActiveAlert() && menuIdx == MENUIDX_ALERT)
       || (getTimeOfDay() == TimeOfDay::LateNight && (menuIdx == MENUIDX_FEED || menuIdx == MENUIDX_STROKE 
-        || menuIdx == MENUIDX_CLEAN || menuIdx == MENUIDX_WALK)))
+        || menuIdx == MENUIDX_ACTIVITY || menuIdx == MENUIDX_CLEAN)))
     {
       menuIdx = (menuIdx + 1) % 8;
     }
@@ -1157,5 +1174,177 @@ bool Watchytchi::sharedWalk_handleButtonPress(uint64_t wakeupBit)
     return true;
   }
 
+  return false;
+}
+
+void Watchytchi::activitySelect_draw()
+{
+  drawBgEnvironment();
+  drawWeather();
+  drawDebugClock();
+
+  // Draw activity options
+  auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
+  auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
+  display.drawBitmap(57, 83, img_MenuIcon_Walk_Active, 32, 32, color_fg);
+  display.drawBitmap(95, 83, img_MenuIcon_HotSprings_Active, 32, 32, color_fg);
+  auto cursorX = 66 + 38 * submenuIdx;
+  display.drawBitmap(cursorX, 69, img_MoodSelectionCursor, 12, 12, color_fg);
+  
+  drawIdleCreature(false);
+  drawPlaymate(idleAnimIdx);
+  drawPoop();
+}
+
+bool Watchytchi::activitySelect_handleButtonPress(uint64_t wakeupBit)
+{
+  if (IS_KEY_CURSOR)
+  {
+    submenuIdx = (submenuIdx + 1) % 2;
+    showWatchFace(true);
+    return true;
+  }
+
+  const int AIDX_SHAREDWALK = 0, AIDX_HOTSPRINGSTIMER = 1;
+  if (IS_KEY_SELECT)
+  {
+    if (submenuIdx == AIDX_SHAREDWALK)
+    {
+      bmaStepsAtWalkStart = sensor.getCounter();
+      lastStepsDuringWalkCount = 0;
+      gameState = GameState::SharedWalk;
+    }
+    else if (submenuIdx == AIDX_HOTSPRINGSTIMER)
+    {
+      hotSpringsTimerSecsLeft = 25 * 60;
+      isHotSpringsTimerPlaying = true;
+      isHotSpringsTimerOnBreak = false;
+      gameState = GameState::HotSpringsTimer;
+    }
+    showWatchFace(true);
+    return true;
+  }
+
+  // Cancel exits the submenu
+  if (IS_KEY_CANCEL)
+  {
+    gameState = GameState::BaseMenu;
+    showWatchFace(true);
+    return true;
+  }
+  return false;
+}
+
+void Watchytchi::hotSpringsTimer_draw()
+{
+  // drawBgEnvironment();
+  clearScreen();
+  auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
+  auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
+  if (isHotSpringsTimerOnBreak)
+    display.drawBitmap(0, 0, img_HotSpringsEnvironment_Rest, 200, 200, color_fg);  
+  else
+    display.drawBitmap(0, 0, img_HotSpringsBackground_Focused, 200, 200, color_fg);  
+
+  auto tensDigit = hotSpringsTimerSecsLeft / 60 / 10;
+  auto onesDigit = (int)ceil(hotSpringsTimerSecsLeft / 60.f - (tensDigit * 10.f));
+
+  if (isHotSpringsTimerPlaying)
+  {
+    display.drawBitmap(19, 37, img_HotSpringHeatSymbol, 68, 46, color_fg);
+    display.drawBitmap(19, 37, img_HotSpringHeatSymbol_Inner, 68, 46, color_bg);
+  }
+  else
+  {
+    display.drawBitmap(19, 37, img_HotSpringPauseSymbol, 68, 46, color_fg);
+    display.drawBitmap(19, 37, img_HotSpringPauseSymbol_Inner, 68, 46, color_bg);
+  }
+  display.drawBitmap(80, 30, hotSpring_nums[tensDigit], 50, 60, color_fg);
+  display.drawBitmap(80, 30, hotSpring_nums_inner[tensDigit], 50, 60, color_bg);
+  display.drawBitmap(124, 30, hotSpring_nums[onesDigit], 50, 60, color_fg);
+  display.drawBitmap(124, 30, hotSpring_nums_inner[onesDigit], 50, 60, color_bg);
+  DBGPrintF("tens digit is "); DBGPrint(tensDigit); DBGPrintF(", ones digit is "); DBGPrint(onesDigit); DBGPrintln();
+  DBGPrintF("Hot Springs seconds left: "); DBGPrint(hotSpringsTimerSecsLeft); DBGPrintln();
+
+  if (isHotSpringsMenuOpen)
+  {
+    display.drawBitmap(2, 6, img_HotSpringsMenuIcon_WaterBottle, 13, 20, color_fg);
+    display.drawBitmap(16, 6, img_HotSpringsMenuIcon_IceCube, 13, 20, color_fg);
+    display.drawBitmap(30, 6, img_HotSpringsMenuIcon_Reset, 13, 20, color_fg);
+    display.drawBitmap(44, 6, isHotSpringsTimerOnBreak ? img_HotSpringsMenuIcon_JumpToFocus : img_HotSpringsMenuIcon_JumpToBreak, 13, 20, color_fg);
+    display.drawBitmap(5 + submenuIdx * 14, 0, img_HotSpringsMenuCursor, 6, 5, color_fg);
+    display.drawBitmap(187, 7, img_HotSpringsCornerSelect, 11, 11, color_fg);
+  }
+  else if (hotSpringsTimerSecsLeft <= 0)
+    display.drawBitmap(187, 7, isHotSpringsTimerOnBreak ? img_HotSpringsMenuIcon_JumpToFocus : img_HotSpringsMenuIcon_JumpToBreak, 13, 20, color_fg);
+  else if (isHotSpringsTimerPlaying)
+    display.drawBitmap(187, 7, img_HotSpringsCornerPause, 10, 13, color_fg);
+  else if (!isHotSpringsTimerPlaying)
+    display.drawBitmap(187, 7, img_HotSpringsCornerPlay, 11, 11, color_fg);
+}
+
+bool Watchytchi::hotSpringsTimer_handleButtonPress(uint64_t wakeupBit)
+{
+  // DEBUG: change timer left
+  if (IS_KEY_CURSOR)
+  {
+    if (!isHotSpringsMenuOpen)
+    {
+      isHotSpringsMenuOpen = true;
+      submenuIdx = 0;
+    }
+    else
+    {
+      submenuIdx = (submenuIdx + 1) % 4;
+    }
+    showWatchFace(true);
+    return true;
+  }
+
+  if (IS_KEY_SELECT)
+  {
+    if (isHotSpringsMenuOpen)
+    {
+      int SUBIDX_Add1Minute = 0, SUBIDX_ADDManyMinutes = 1, SUBIDX_ResetTimer = 2, SUBIDX_SwitchToBreak = 3;
+      if (submenuIdx == SUBIDX_Add1Minute)
+        hotSpringsTimerSecsLeft += 60;
+      else if (submenuIdx == SUBIDX_ADDManyMinutes)
+        hotSpringsTimerSecsLeft += 5 *60;
+      else if (submenuIdx == SUBIDX_ResetTimer)
+        hotSpringsTimerSecsLeft = isHotSpringsTimerOnBreak ? 5 * 60 : 25 * 60;
+      else if (submenuIdx == SUBIDX_SwitchToBreak)
+      {
+        isHotSpringsTimerOnBreak = !isHotSpringsTimerOnBreak;
+        hotSpringsTimerSecsLeft = isHotSpringsTimerOnBreak ? 5 * 60 : 25 * 60;
+      }
+
+    }
+    // Pressing select while the timer is active will toggle pause
+    else if (hotSpringsTimerSecsLeft > 0)
+      isHotSpringsTimerPlaying = !isHotSpringsTimerPlaying;
+    // Pressing select with an expired timer will begin or end the break
+    else
+    {
+      isHotSpringsTimerOnBreak = !isHotSpringsTimerOnBreak;
+      hotSpringsTimerSecsLeft = isHotSpringsTimerOnBreak ? 5 * 60 : 25 * 60;
+    }
+    showWatchFace(true);
+    return true;
+  }
+
+  if (IS_KEY_CANCEL)
+  {
+    // Cancel exits the submenu if open
+    if (isHotSpringsMenuOpen)
+      isHotSpringsMenuOpen = false;
+    // Otherwise, exit hot springs
+    else
+    {
+      gameState = GameState::BaseMenu;
+    }
+
+    showWatchFace(true);
+    return true;
+  }
   return false;
 }

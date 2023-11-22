@@ -79,7 +79,6 @@ void Watchytchi::poseHWYDQuestion()
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
 
   // First, pose the question:
-  // TODO: Snake support
   critter->DrawPosingQuestionPose(idleAnimIdx, false);
   idleAnimIdx = (idleAnimIdx + 1) % 2;
   display.drawBitmap(69, 83, img_HowWasYourDayIcon, 32, 32, color_fg);
@@ -98,7 +97,7 @@ void Watchytchi::executeHWYDResponse()
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
   const int EIDX_ANGRY = 0, EIDX_SAD = 1, EIDX_NEUTRAL = 2, EIDX_HAPPY = 3;
 
-  switch(emotionSelectIdx)
+  switch(submenuIdx)
   {
     case EIDX_ANGRY:
       // TODO: angry reaction with a lil knife
@@ -147,7 +146,7 @@ bool Watchytchi::howWasYourDay_handleButtonPress(uint64_t wakeupBit)
 {
   if (IS_KEY_CURSOR) 
   {
-      emotionSelectIdx = (emotionSelectIdx + 1) % 4;
+      submenuIdx = (submenuIdx + 1) % 4;
       showWatchFace(true);
       return true;
   }
@@ -181,7 +180,7 @@ void Watchytchi::howWasYourDay_draw()
   display.drawBitmap(69, 83, img_HappinessMoodle_Sad, 30, 30, color_fg);
   display.drawBitmap(101, 83, img_HappinessMoodle_Neutral, 30, 30, color_fg);
   display.drawBitmap(133, 83, img_HappinessMoodle_Happy, 30, 30, color_fg);
-  auto cursorX = 46 + 32 * emotionSelectIdx;
+  auto cursorX = 46 + 32 * submenuIdx;
   display.drawBitmap(cursorX, 69, img_MoodSelectionCursor, 12, 12, color_fg);
   
   drawIdleCreature(false);

@@ -42,12 +42,19 @@ RTC_DATA_ATTR bool isStrokingLeftSide = false;
 /*## State: Game State (Events & Alerts) ##*/
 RTC_DATA_ATTR int nextAlertTs = -1;
 RTC_DATA_ATTR ScheduledAlertType nextAlertType = ScheduledAlertType::None;
-RTC_DATA_ATTR int emotionSelectIdx = 0;
+RTC_DATA_ATTR int submenuIdx = 0;
 RTC_DATA_ATTR bool hasExecutedEnding = false;
 
 /*## State: Shared Walk ##*/
 RTC_DATA_ATTR int bmaStepsAtWalkStart;
 RTC_DATA_ATTR int lastStepsDuringWalkCount;
+
+/*## State: Game State (Hot Springs Timer) ##*/
+RTC_DATA_ATTR int hotSpringsTimerSecsLeft;
+RTC_DATA_ATTR bool isHotSpringsTimerPlaying = true;
+RTC_DATA_ATTR bool isHotSpringsTimerOnBreak = false;
+RTC_DATA_ATTR bool isHotSpringsMenuOpen = false;
+
 
 /*## State: Game State (Playmate) ##*/
 RTC_DATA_ATTR PlaymateSpecies activePlaymate = PlaymateSpecies::NoPlaymate;

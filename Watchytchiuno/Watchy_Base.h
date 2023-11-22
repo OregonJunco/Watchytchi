@@ -12,7 +12,8 @@
 
 enum CreatureSpecies {Hog, Snake, Deer, COUNT};
 enum ScheduledAlertType {None, CloseUp, AskAboutDay};
-enum GameState {BaseMenu, Eating, AlertInteraction, StrokingMode, HowWasYourDay, Ending, SharedWalk, CNT};
+enum GameState {BaseMenu, Eating, AlertInteraction, StrokingMode, HowWasYourDay, Ending, SharedWalk,
+    ActivitySelection, HotSpringsTimer, CNT};
 enum PlaymateSpecies {NoPlaymate = 0, JuncoSnake = 1, SnappyLog = 2, BugRat = 3, NUMPLAYMATES};
 /*
 enum PlaymateSpecies {None = -1, JuncoSnake, LogGator, BeerPenguin, GooseHydra, PetRock, KingSnake, EyeFrog, RockHider,
@@ -92,7 +93,7 @@ extern RTC_DATA_ATTR int nextAlertTs;
 const String nvsKey_nextAlertTs = "nextAlertTs";
 extern RTC_DATA_ATTR ScheduledAlertType nextAlertType;
 const String nvsKey_nextAlertType = "nextAlertType";
-extern RTC_DATA_ATTR int emotionSelectIdx;
+extern RTC_DATA_ATTR int submenuIdx;
 
 /*## State: Game State (Ending) ##*/
 extern RTC_DATA_ATTR bool hasExecutedEnding;
@@ -100,6 +101,12 @@ extern RTC_DATA_ATTR bool hasExecutedEnding;
 /*## State: Game State (Shared Walk) ##*/
 extern RTC_DATA_ATTR int bmaStepsAtWalkStart;
 extern RTC_DATA_ATTR int lastStepsDuringWalkCount;
+
+/*## State: Game State (Hot Springs Timer) ##*/
+extern RTC_DATA_ATTR int hotSpringsTimerSecsLeft;
+extern RTC_DATA_ATTR bool isHotSpringsTimerPlaying;
+extern RTC_DATA_ATTR bool isHotSpringsTimerOnBreak;
+extern RTC_DATA_ATTR bool isHotSpringsMenuOpen;
 
 /*## State: Game State (Playmate) ##*/
 extern RTC_DATA_ATTR PlaymateSpecies activePlaymate;
@@ -128,8 +135,8 @@ const int MENUIDX_INSPECT = 0;
 const int MENUIDX_STROKE = 1;
 const int MENUIDX_FEED = 2;
 const int MENUIDX_ALERT = 3;
-const int MENUIDX_CLEAN = 4;
-const int MENUIDX_WALK = 5;
+const int MENUIDX_ACTIVITY = 4;
+const int MENUIDX_CLEAN = 5;
 const int MENUIDX_LIGHT = 6;
 const int MENUIDX_RESET = 7;
 
