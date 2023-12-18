@@ -1258,8 +1258,9 @@ void Watchytchi::hotSpringsTimer_draw()
   else
     display.drawBitmap(0, 0, img_HotSpringsBackground_Focused, 200, 200, color_fg);  
 
-  auto tensDigit = hotSpringsTimerSecsLeft / 60 / 10;
-  auto onesDigit = (int)ceil(hotSpringsTimerSecsLeft / 60.f - (tensDigit * 10.f));
+  auto roundedTimer = ceil(hotSpringsTimerSecsLeft / 60.f);
+  int tensDigit = floor(roundedTimer / 10);
+  int onesDigit = (int)roundedTimer % 10;
 
   if (isHotSpringsTimerPlaying)
   {
