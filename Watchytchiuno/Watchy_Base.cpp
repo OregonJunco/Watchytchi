@@ -23,6 +23,7 @@ RTC_DATA_ATTR float walkHappy_rtc = 0.f;
 RTC_DATA_ATTR float poopHappy_rtc = 0.f;
 RTC_DATA_ATTR float sleepHappy_rtc = 0.f;
 RTC_DATA_ATTR float playmateHappy_rtc = 0.f;
+RTC_DATA_ATTR float hotSpringsHappy_rtc = 0.f;
 RTC_DATA_ATTR bool hasPoop = false;
 RTC_DATA_ATTR int lastPoopHour = -1;
 RTC_DATA_ATTR int badEndSeconds = 0;

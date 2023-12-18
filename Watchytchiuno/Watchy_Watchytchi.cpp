@@ -117,6 +117,7 @@ void Watchytchi::tryLoadSaveData(bool force)
   poopHappy_rtc = NVS.getFloat(nvsKey_poopHappy, poopHappy.defaultValue);
   sleepHappy_rtc = NVS.getFloat(nvsKey_sleepHappy, sleepHappy.defaultValue);
   playmateHappy_rtc = NVS.getFloat(nvsKey_playmateHappy, playmateHappy.defaultValue);
+  hotSpringsHappy_rtc = NVS.getFloat(nvsKey_hotSpringsHappy, hotSpringsHappy.defaultValue);
   badEndSeconds = NVS.getInt(nvsKey_badEndSeconds, 0);
   badEndShieldSeconds = NVS.getInt(nvsKey_badEndShieldSeconds, 0);
   hasPoop = 1 == NVS.getInt(nvsKey_hasPoop, 0);
@@ -140,6 +141,7 @@ void Watchytchi::loadFromRTC()
   poopHappy.value = poopHappy_rtc;
   sleepHappy.value = sleepHappy_rtc;
   playmateHappy.value = playmateHappy_rtc;
+  hotSpringsHappy.value = hotSpringsHappy_rtc;
   
   // Assign creature (TODO: convert to map or enum-linked array)
   if (species == CreatureSpecies::Hog)
@@ -178,6 +180,7 @@ void Watchytchi::tryWriteSaveData(bool force)
   NVS.setFloat(nvsKey_poopHappy, poopHappy.value, false);
   NVS.setFloat(nvsKey_sleepHappy, sleepHappy.value, false);
   NVS.setFloat(nvsKey_playmateHappy, playmateHappy.value, false);
+  NVS.setFloat(nvsKey_hotSpringsHappy, hotSpringsHappy.value, false);
   NVS.setInt(nvsKey_badEndSeconds, badEndSeconds, false);
   NVS.setInt(nvsKey_badEndShieldSeconds, badEndShieldSeconds, false);
   NVS.setInt(nvsKey_hasPoop, hasPoop ? 1 : 0, false);
@@ -200,6 +203,7 @@ void Watchytchi::writeToRTC()
   poopHappy_rtc = poopHappy.value;
   sleepHappy_rtc = sleepHappy.value;
   playmateHappy_rtc = playmateHappy.value;
+  hotSpringsHappy_rtc = hotSpringsHappy.value;
 }
 
 void Watchytchi::resetSaveData()
@@ -230,6 +234,8 @@ void Watchytchi::resetSaveData()
   NVS.setFloat(nvsKey_sleepHappy, sleepHappy.defaultValue, false);
   playmateHappy_rtc = playmateHappy.defaultValue;
   NVS.setFloat(nvsKey_playmateHappy, playmateHappy.defaultValue, false);
+  hotSpringsHappy_rtc = hotSpringsHappy.defaultValue;
+  NVS.setFloat(nvsKey_hotSpringsHappy, hotSpringsHappy.defaultValue, false);
   badEndSeconds = 0;
   NVS.setInt(nvsKey_badEndSeconds, badEndSeconds, false);
   badEndShieldSeconds = 0;
@@ -428,12 +434,18 @@ void Watchytchi::tickCreatureState()
       playmateHappy.AddTo(happyDeltaAmt);
     else
       playmateHappy.MoveTowards(0, happyDeltaAmt * 0.25f);
+
+    // If I'm in the hot springs, I'm ambiently happy (TODO: instead focus on completing timers rather than ambient gain)
+    if (gameState == GameState::HotSpringsTimer)
+      hotSpringsHappy.AddTo(happyDeltaAmt * 0.25f);
+    else
+      hotSpringsHappy.MoveTowards(0, happyDeltaAmt * 0.25f);
   }
 
   lastHappyDelta = getHappyPercent() - oldHappyPercent;
   DBGPrintF("Happy Contributions: food "); DBGPrint(foodHappy.value); DBGPrintF(", stroke "); DBGPrint(strokeHappy.value); 
     DBGPrintF(", walk "); DBGPrint(walkHappy.value); DBGPrintF(", poopHappy "); DBGPrint(poopHappy.value); DBGPrintF(", sleep "); 
-    DBGPrint(sleepHappy.value); DBGPrintF(", playmate "); DBGPrint(playmateHappy.value); DBGPrintln();
+    DBGPrint(sleepHappy.value); DBGPrintF(", playmate "); DBGPrint(playmateHappy.value); DBGPrintF(", hot springs "); DBGPrint(hotSpringsHappy.value); DBGPrintln();
   DBGPrintF("New happyPercent "); DBGPrint(getHappyPercent()); DBGPrintF(", from old happy percent "); DBGPrint(oldHappyPercent); 
   DBGPrintF(", lastHappyDelta is "); DBGPrint(lastHappyDelta); DBGPrintln();
 
@@ -503,7 +515,7 @@ TimeOfDay Watchytchi::getTimeOfDay(const tmElements_t &tm)
 float Watchytchi::getHappyPercent(bool shouldConstrain)
 {
   auto rawSum = foodHappy.value + strokeHappy.value + walkHappy.value 
-    + poopHappy.value + sleepHappy.value + playmateHappy.value;
+    + poopHappy.value + sleepHappy.value + playmateHappy.value + hotSpringsHappy.value;
   if (shouldConstrain)
     return constrain(rawSum, 0, 1);
   else
@@ -1251,8 +1263,16 @@ void Watchytchi::hotSpringsTimer_draw()
 
   if (isHotSpringsTimerPlaying)
   {
-    display.drawBitmap(19, 37, img_HotSpringHeatSymbol, 68, 46, color_fg);
-    display.drawBitmap(19, 37, img_HotSpringHeatSymbol_Inner, 68, 46, color_bg);
+    if (isHotSpringsTimerOnBreak)
+    {
+      display.drawBitmap(19, 37, img_HotSpringWaterSymbol, 68, 46, color_fg);
+      display.drawBitmap(19, 37, img_HotSpringWaterSymbol_Inner, 68, 46, color_bg);
+    }
+    else
+    {
+      display.drawBitmap(19, 37, img_HotSpringHeatSymbol, 68, 46, color_fg);
+      display.drawBitmap(19, 37, img_HotSpringHeatSymbol_Inner, 68, 46, color_bg);
+    }
   }
   else
   {

@@ -65,6 +65,8 @@ extern RTC_DATA_ATTR float sleepHappy_rtc;
 const String nvsKey_sleepHappy = "sleepHappy";
 extern RTC_DATA_ATTR float playmateHappy_rtc;
 const String nvsKey_playmateHappy = "playmateHappy";
+extern RTC_DATA_ATTR float hotSpringsHappy_rtc;
+const String nvsKey_hotSpringsHappy = "hotSpringsHappy";
 static float lastHappyDelta;
 extern RTC_DATA_ATTR int badEndSeconds;
 const String nvsKey_badEndSeconds = "badEndSecs";
@@ -162,6 +164,7 @@ class WatchyBase : public Watchy {
         HappyContributor poopHappy = HappyContributor(0.f,  -0.334f, 0.2f);
         HappyContributor sleepHappy = HappyContributor(0.f,  -0.334f, 0.f);
         HappyContributor playmateHappy = HappyContributor(0.f,  0.f, 0.2f);
+        HappyContributor hotSpringsHappy = HappyContributor(0.f,  0.f, 0.2f);
     private:
         void _rtcConfig();
 };
