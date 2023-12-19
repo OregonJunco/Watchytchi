@@ -353,9 +353,12 @@ void Watchytchi::tickCreatureState()
   // Put down status display if we select a new menu option
   hasStatusDisplay &= menuIdx == 0;
 
+  // Stat atrophy is slower in the morning to limit cases where you wake up and your creature is miserable
+  auto atrophySpeedModifier = currentTime.Hour > 10 ? 1.f : 0.5f;
+
   /*# Aprophy Hunger #*/
   auto oldHunger = hunger;
-  auto hungerDelta = timeDelta / k_secDurationToFullyDepleteHunger;
+  auto hungerDelta = timeDelta / k_secDurationToFullyDepleteHunger * atrophySpeedModifier;
   if (getTimeOfDay() != TimeOfDay::LateNight)
     hunger -= hungerDelta;
   if (hunger < 0.f)
@@ -409,7 +412,7 @@ void Watchytchi::tickCreatureState()
 
     // Food happy goes up or down based on whether I'm fed
     if (hunger < 0.45f)
-      foodHappy.AddTo(-happyDeltaAmt);
+      foodHappy.AddTo(-happyDeltaAmt * atrophySpeedModifier);
     else if (hunger >= 0.6f)
       foodHappy.AddTo(happyDeltaAmt);
 
@@ -419,7 +422,7 @@ void Watchytchi::tickCreatureState()
 
     // Poop being out makes me unhappy
     if (hasPoop)
-      poopHappy.AddTo(-happyDeltaAmt);
+      poopHappy.AddTo(-happyDeltaAmt * atrophySpeedModifier);
     else
       poopHappy.MoveTowards(0, happyDeltaAmt);
 
@@ -451,13 +454,21 @@ void Watchytchi::tickCreatureState()
 
   /*# Tick running away #*/
   auto isContemplatingRunAway = getHappyPercent() <= 0.f && isUnhappinessIncreasing();
+  // Gaining bad end points respects the atrophy speed modifier. Can't gain bad end points too late at night to prevent
+  //  a run-away triggering simply by forgetting to turn off the lights one night
+  auto badEndProgressDelta = timeDelta * atrophySpeedModifier;
+  if (currentTime.Hour < 9)
+    badEndProgressDelta = 0;
 
   // Offer a buffer "shield" that ticks up first before you get permanent run away points
   const int k_shieldSecondsSize = 30 * 60;
-  badEndShieldSeconds = constrain(badEndShieldSeconds + timeDelta * (isContemplatingRunAway ? 1.f : -1.f), 0.f, k_shieldSecondsSize);
+  if (isContemplatingRunAway)
+    badEndShieldSeconds = constrain(badEndShieldSeconds + badEndProgressDelta, 0.f, k_shieldSecondsSize);  
+  else
+    badEndShieldSeconds = constrain(badEndShieldSeconds - timeDelta, 0.f, k_shieldSecondsSize);
   // Once the shield is used up, accumulate permanent bad points
   if (isContemplatingRunAway && badEndShieldSeconds >= k_shieldSecondsSize)
-    badEndSeconds += timeDelta;
+    badEndSeconds += badEndProgressDelta;
   // The bad end meter can go down just a tad if you're happy and hovering at the edge
   if (getHappyTier() == HappyTier::Blissful && badEndSeconds > k_secondsThresholdForBadEnd * 0.8f)
     badEndSeconds -= timeDelta;
