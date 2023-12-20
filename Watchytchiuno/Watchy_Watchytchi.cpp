@@ -126,6 +126,8 @@ void Watchytchi::tryLoadSaveData(bool force)
   nextAlertType = (ScheduledAlertType)NVS.getInt(nvsKey_nextAlertType, 0);
   activePlaymate = (PlaymateSpecies)NVS.getInt(nvsKey_activePlaymate, (int)PlaymateSpecies::NoPlaymate);
   lastPlaymateJoinTs = NVS.getInt(nvsKey_lastPlaymateJoinTs, -1);
+  befriendedPlaymatesMask = NVS.getInt(nvsKey_befriendedPlaymatesMask, 0);
+  bestFriendPlaymate = (PlaymateSpecies)NVS.getInt(nvsKey_bestFriendPlaymate, (int)PlaymateSpecies::NoPlaymate);
   DBGPrintF("Loading!! lastUpdateTsEpoch "); DBGPrint(lastUpdateTsEpoch); DBGPrintln();
   DBGPrintF("Loaded nextAlertType "); DBGPrint(nextAlertType); DBGPrintln();
   
@@ -189,6 +191,8 @@ void Watchytchi::tryWriteSaveData(bool force)
   NVS.setInt(nvsKey_nextAlertType, (int)nextAlertType, false);
   NVS.setInt(nvsKey_activePlaymate, (int)activePlaymate, false);
   NVS.setInt(nvsKey_lastPlaymateJoinTs, lastPlaymateJoinTs, false);
+  NVS.setInt(nvsKey_befriendedPlaymatesMask, befriendedPlaymatesMask, false);
+  NVS.setInt(nvsKey_bestFriendPlaymate, bestFriendPlaymate, false);
   auto didSave = NVS.commit();
   DBGPrintF("Save success? "); DBGPrint(didSave); DBGPrintln();
   
@@ -259,6 +263,10 @@ void Watchytchi::resetSaveData()
   NVS.setInt(nvsKey_activePlaymate, activePlaymate, false);
   lastPlaymateJoinTs = -1;
   NVS.setInt(nvsKey_lastPlaymateJoinTs, lastPlaymateJoinTs, false);
+  befriendedPlaymatesMask = 0;
+  NVS.setInt(nvsKey_befriendedPlaymatesMask, befriendedPlaymatesMask, false);
+  bestFriendPlaymate = PlaymateSpecies::NoPlaymate;
+  NVS.setInt(nvsKey_bestFriendPlaymate, bestFriendPlaymate, false);
   submenuIdx = 0;
   hasExecutedEnding = false;
   auto didSave = NVS.commit();
@@ -485,6 +493,15 @@ void Watchytchi::tickCreatureState()
     hasPoop = true;
     lastPoopHour = currentTime.Hour;
     scheduleVibration(3, 50);
+
+    // Random chance to add a playmate if I've already befriended one
+    // HACK: we do this at the same time as pooping because it's roughly the same frequency that we want to check at
+    if (!hasActivePlaymate() && befriendedPlaymatesMask != 0)
+    {
+      srand(lastUpdateTsEpoch);
+      if (rand() % 4 == 0)
+        chooseNewActivePlaymate(true);
+    }
   }
   else
   {
@@ -563,6 +580,37 @@ bool Watchytchi::qualifiesForBadEnd()
 bool Watchytchi::isElectricLit()
 {
   return getTimeOfDay() == TimeOfDay::LateNight && !invertColors;
+}
+
+void Watchytchi::chooseNewActivePlaymate(bool onlyBefriended)
+{
+  // If I have a best friend, they are more likely to join me
+  srand(lastUpdateTsEpoch);
+  if (bestFriendPlaymate != PlaymateSpecies::NoPlaymate && rand() % 2 == 0)
+    activePlaymate = bestFriendPlaymate;
+  // Choose random playmate
+  else
+  {
+    auto newPmIdx = rand() % (int)PlaymateSpecies::NUMPLAYMATES;
+    // If I'm only supposed to choose befriended ones, budge the int until I choose a befriended playmate
+    if (onlyBefriended && befriendedPlaymatesMask != 0)
+    {
+      while (0 == ((1 << newPmIdx) & befriendedPlaymatesMask))
+        newPmIdx = (newPmIdx + 1) % (int)PlaymateSpecies::NUMPLAYMATES;
+    }
+    activePlaymate = (PlaymateSpecies)newPmIdx;
+  }
+
+  lastPlaymateJoinTs = lastUpdateTsEpoch;
+  befriendedPlaymatesMask |= (1 << (int)activePlaymate);
+
+  if (bestFriendPlaymate == PlaymateSpecies::NoPlaymate)
+  {
+    // Potential of this playmate becoming my new best friend!
+    srand(lastUpdateTsEpoch);
+    if (rand() % 3 == 0)
+      bestFriendPlaymate = activePlaymate; 
+  }
 }
 
 bool Watchytchi::hasActivePlaymate()
@@ -1160,13 +1208,10 @@ void Watchytchi::sharedWalk_draw()
 
     // Every time we add happiness, we have a chance to add a playmate
     srand(lastUpdateTsEpoch);
-    auto shouldGetPlaymate = activePlaymate == PlaymateSpecies::NoPlaymate && rand() % 16 == 0;
-    // auto shouldGetPlaymate = true;
+    auto shouldGetPlaymate = activePlaymate == PlaymateSpecies::NoPlaymate && rand() % 12 == 0;
     if (shouldGetPlaymate)
     {
-      // Choose a random playmate from all the options
-      activePlaymate = (PlaymateSpecies)(rand() % (int)PlaymateSpecies::NUMPLAYMATES);
-      lastPlaymateJoinTs = lastUpdateTsEpoch;
+      chooseNewActivePlaymate(false);
     }    
   }
 

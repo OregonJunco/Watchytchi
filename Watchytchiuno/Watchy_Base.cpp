@@ -60,6 +60,8 @@ RTC_DATA_ATTR bool isHotSpringsMenuOpen = false;
 /*## State: Game State (Playmate) ##*/
 RTC_DATA_ATTR PlaymateSpecies activePlaymate = PlaymateSpecies::NoPlaymate;
 RTC_DATA_ATTR int lastPlaymateJoinTs = -1;
+RTC_DATA_ATTR int befriendedPlaymatesMask = 0;
+RTC_DATA_ATTR PlaymateSpecies bestFriendPlaymate = PlaymateSpecies::NoPlaymate;
 
 uint8_t scheduledVibrationTimes;
 uint32_t scheduledVibrationDelay;

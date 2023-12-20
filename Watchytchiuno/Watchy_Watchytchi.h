@@ -36,6 +36,7 @@ class Watchytchi : public WatchyBase{
         bool isUnhappinessIncreasing();
         bool qualifiesForBadEnd();
         bool isElectricLit();
+        void chooseNewActivePlaymate(bool onlyBefriended);
         bool hasActivePlaymate();
         int getPlaymateXOffset();
 

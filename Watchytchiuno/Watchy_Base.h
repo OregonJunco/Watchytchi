@@ -14,7 +14,7 @@ enum CreatureSpecies {Hog, Snake, Deer, COUNT};
 enum ScheduledAlertType {None, CloseUp, AskAboutDay};
 enum GameState {BaseMenu, Eating, AlertInteraction, StrokingMode, HowWasYourDay, Ending, SharedWalk,
     ActivitySelection, HotSpringsTimer, CNT};
-enum PlaymateSpecies {NoPlaymate = 0, JuncoSnake = 1, SnappyLog = 2, BugRat = 3, NUMPLAYMATES};
+enum PlaymateSpecies {NoPlaymate = -1, JuncoSnake = 0, SnappyLog = 1, BugRat = 2, NUMPLAYMATES};
 /*
 enum PlaymateSpecies {None = -1, JuncoSnake, LogGator, BeerPenguin, GooseHydra, PetRock, KingSnake, EyeFrog, RockHider,
     HaringHead, StaplerFish, EyePine, BootSnail}
@@ -115,6 +115,10 @@ extern RTC_DATA_ATTR PlaymateSpecies activePlaymate;
 const String nvsKey_activePlaymate = "activePM";
 extern RTC_DATA_ATTR int lastPlaymateJoinTs;
 const String nvsKey_lastPlaymateJoinTs = "lastPMTs";
+extern RTC_DATA_ATTR int befriendedPlaymatesMask;
+const String nvsKey_befriendedPlaymatesMask = "befriendedPMsMask";
+extern RTC_DATA_ATTR PlaymateSpecies bestFriendPlaymate;
+const String nvsKey_bestFriendPlaymate = "bestFriendPlaymate";
 
 // Compile out macros to increase speed of serial printing
 #define DBGPrint(content) if (VERBOSE_LOGGING_ENABLED) {Serial.print(content);}
