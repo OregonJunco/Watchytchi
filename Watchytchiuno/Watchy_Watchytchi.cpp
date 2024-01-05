@@ -660,7 +660,7 @@ void Watchytchi::drawUIButton(int idx, bool quickCursorUpdate)
     if (idx < numPerRow)
       yPos = 1;
     else
-      yPos = height - buttonWidth - 1;
+      yPos = height - buttonWidth - 2;
 
     // Cursor timeout
     if (currentTime.Minute - lastAdvanceIdxMinute >= 2 || (lastAdvanceIdxMinute > currentTime.Minute && currentTime.Minute >= 1))
@@ -702,6 +702,16 @@ void Watchytchi::drawUIButton(int idx, bool quickCursorUpdate)
     }
     else
       display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Placeholder_Active : img_MenuIcon_Placeholder_Inactive, 32, 32, iconColor);
+
+    // Selected drop shadow
+    if (idx == menuIdx)
+    {
+      if (idx < numPerRow) 
+        display.drawBitmap(xPos, yPos + buttonWidth + 1, img_MenuIconShadow, 32, 2, iconColor);
+      else
+        display.drawBitmap(xPos, yPos + buttonWidth, img_MenuIconShadow, 32, 2, iconColor);
+
+    }
 }
 
 void Watchytchi::drawAllUIButtons()
