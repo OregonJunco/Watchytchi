@@ -53,13 +53,14 @@ class Watchytchi : public WatchyBase{
         void drawAllUIButtons();
         void drawBgEnvironment();
         void drawWeather();
+        bool tryDrawMoodle(int& idx, const unsigned char* happyIcon, const unsigned char* sadIcon, float happyLevel);
         void drawIdleCreature(bool isAnimating);
         void drawEatAnim();
         void drawPlaymate(int idleIdx);
         void drawAgeFlower();
         void drawDebugClock();
         void drawPoop();
-        void drawStatusDisplay();
+
         /*## Draw functions (Schedulable Alerts) ##*/
         void executeHWYDResponse();
 
@@ -67,6 +68,8 @@ class Watchytchi : public WatchyBase{
         bool dummy_handleButtonPress(uint64_t wakeupBit);
         void baseMenu_draw();
         bool baseMenu_handleButtonPress(uint64_t wakeupBit);
+        void statusCheck_draw();
+        bool statusCheck_handleButtonPress(uint64_t wakeupBit);
         void eating_draw();
         void alertInteraction_draw();
         void stroking_draw();
@@ -86,6 +89,7 @@ class Watchytchi : public WatchyBase{
         typedef void (Watchytchi::*DrawFunc)();
         DrawFunc drawFuncsByState[(int)GameState::CNT] = {
             &Watchytchi::baseMenu_draw, // BASEMENU
+            &Watchytchi::statusCheck_draw, // STATUSCHECK
             &Watchytchi::eating_draw, // EATING
             &Watchytchi::alertInteraction_draw, // ALERT INTERACTION
             &Watchytchi::stroking_draw, // STROKING
@@ -99,6 +103,7 @@ class Watchytchi : public WatchyBase{
         typedef bool (Watchytchi::*ButtonFunc)(long long unsigned int);
         ButtonFunc handleButtonFuncsByState[(int)GameState::CNT] = {
             &Watchytchi::baseMenu_handleButtonPress, // BASEMENU
+            &Watchytchi::statusCheck_handleButtonPress, // STATUSCHECK
             &Watchytchi::dummy_handleButtonPress, // EATING
             &Watchytchi::dummy_handleButtonPress, // ALERT INTERACTION
             &Watchytchi::stroking_handleButtonPress, // STROKING

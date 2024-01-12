@@ -12,7 +12,7 @@
 
 enum CreatureSpecies {Hog, Snake, Deer, COUNT};
 enum ScheduledAlertType {None, CloseUp, AskAboutDay};
-enum GameState {BaseMenu, Eating, AlertInteraction, StrokingMode, HowWasYourDay, Ending, SharedWalk,
+enum GameState {BaseMenu, StatusCheck, Eating, AlertInteraction, StrokingMode, HowWasYourDay, Ending, SharedWalk,
     ActivitySelection, HotSpringsTimer, CNT};
 enum PlaymateSpecies {NoPlaymate = -1, JuncoSnake = 0, SnappyLog = 1, BugRat = 2, NUMPLAYMATES};
 /*
@@ -42,7 +42,6 @@ extern RTC_DATA_ATTR int lastSaveTs;
 /*## State: UI ##*/
 extern RTC_DATA_ATTR int menuIdx;
 extern RTC_DATA_ATTR int lastAdvanceIdxMinute;
-extern RTC_DATA_ATTR bool hasStatusDisplay;
 extern RTC_DATA_ATTR bool invertColors;
 const String nvsKey_invertColors = "invertColors";
 

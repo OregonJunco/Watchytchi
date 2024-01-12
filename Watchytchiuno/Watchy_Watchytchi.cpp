@@ -217,7 +217,6 @@ void Watchytchi::resetSaveData()
   NVS.setInt(nvsKey_lastUpdateTsEpoch, lastUpdateTsEpoch);
   menuIdx = 0;
   lastAdvanceIdxMinute = 0;
-  hasStatusDisplay = false;
   invertColors = false;
   NVS.setInt(nvsKey_invertColors, invertColors);
   species = CreatureSpecies::Deer;
@@ -358,9 +357,6 @@ void Watchytchi::tickCreatureState()
   if (menuIdx != MENUIDX_RESET)
     numResetPresses = 0;
 
-  // Put down status display if we select a new menu option
-  hasStatusDisplay &= menuIdx == 0;
-
   // Stat atrophy is slower in the morning to limit cases where you wake up and your creature is miserable
   auto atrophySpeedModifier = currentTime.Hour > 10 ? 1.f : 0.5f;
 
@@ -448,7 +444,7 @@ void Watchytchi::tickCreatureState()
 
     // If I'm in the hot springs, I'm ambiently happy (TODO: instead focus on completing timers rather than ambient gain)
     if (gameState == GameState::HotSpringsTimer)
-      hotSpringsHappy.AddTo(happyDeltaAmt * 0.25f);
+      hotSpringsHappy.AddTo(happyDeltaAmt);
     else
       hotSpringsHappy.MoveTowards(0, happyDeltaAmt * 0.25f);
   }
@@ -776,6 +772,39 @@ void Watchytchi::drawWeather(){
   display.drawBitmap(cloud3X, 30, isDark ? img_DarkCloud3 : img_Cloud3, 130, 35, color_fg);
 }
 
+bool Watchytchi::tryDrawMoodle(int &idx, const unsigned char *happyIcon, const unsigned char *sadIcon, float happyLevel)
+{
+  if (abs(happyLevel) < 0.1)
+    return false;
+
+  const int k_topLeftX = 8;
+  const int k_topLeftY = 21;
+  const int k_moodleWidth = 32;
+  const int k_moodlePadding = 2;
+  const int k_numPerRow = 5;
+  
+  int k_columnIdx = idx % k_numPerRow;
+  int xPos = k_topLeftX + k_moodleWidth * k_columnIdx + k_moodlePadding * max(0, k_columnIdx);
+  int yPos = idx < k_numPerRow ? k_topLeftY : k_topLeftY + k_moodleWidth + 1;
+  
+  auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
+  // Draw border depending on mood
+  if (happyLevel <= -0.2f)
+    display.drawBitmap(xPos, yPos, img_MoodleBorder_ThunderCloud, 32, 32, color_fg);
+  else if (happyLevel <= -0.1f)
+    display.drawBitmap(xPos, yPos, img_MoodleBorder_SmallCloud, 32, 32, color_fg);
+  else if (happyLevel >= 0.2f)
+    display.drawBitmap(xPos, yPos, img_MoodleBorder_BigHeart, 32, 32, color_fg);
+  else if (happyLevel >= 0.1f)
+    display.drawBitmap(xPos, yPos, img_MoodleBorder_SmallHeart, 32, 32, color_fg);
+    
+  // Draw mood icon
+  display.drawBitmap(xPos, yPos, happyLevel > 0 ? happyIcon : sadIcon, 32, 32, color_fg);
+
+  idx++;
+  return true;
+}
+
 void Watchytchi::drawIdleCreature(bool isAnimating){
   auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
@@ -909,36 +938,6 @@ void Watchytchi::drawPoop()
     display.drawBitmap(xPos, 200 - 32 - 20 - 4, idleAnimIdx % 2 == 0 ? img_SmallPoop_1 : img_SmallPoop_2, 20, 20, color_fg);
 }
 
-void Watchytchi::drawStatusDisplay()
-{
-  auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
-  auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
-  int hungerNumIdx = (int)(hunger * 10.f);
-  if (hungerNumIdx > 9)
-    hungerNumIdx = 9;
-  auto age = (int)(numSecondsAlive / (24 * 60 * 60));
-  display.drawBitmap(10, 110, dk_nums[hungerNumIdx], 28, 26, color_fg); //first digit
-  display.drawBitmap(158, 110, dk_nums[constrain(age, 0, 9)], 28, 26, color_fg);
-  // Draw a face according to current mood:
-
-  auto happyTier = getHappyTier();
-  if (happyTier == HappyTier::Blissful)
-    display.drawBitmap(85, 75, img_HappinessMoodle_Blissful, 30, 30, color_fg);
-  else if (happyTier == HappyTier::Happy)
-    display.drawBitmap(85, 75, img_HappinessMoodle_Happy, 30, 30, color_fg);
-  else if (happyTier == HappyTier::Neutral)
-    display.drawBitmap(85, 75, img_HappinessMoodle_Neutral, 30, 30, color_fg);
-  else
-    display.drawBitmap(85, 75, img_HappinessMoodle_Sad, 30, 30, color_fg);
-
-  // Steps!
-  uint32_t stepCount = sensor.getCounter();
-  display.setFont(&FreeMonoBold9pt7b);
-  display.setTextColor(GxEPD_BLACK);
-  display.setCursor(40, 55);
-  display.println(stepCount);
-}
-
 bool Watchytchi::dummy_handleButtonPress(uint64_t)
 {
   return false;
@@ -950,10 +949,6 @@ void Watchytchi::baseMenu_draw()
   drawWeather();
   drawAllUIButtons();
   drawDebugClock();
-
-  /*# Status Display #*/
-  if (hasStatusDisplay) // TODO: make into own gamestate
-    drawStatusDisplay();
 
   // Animate an idle loop every 3 minutes
   if (currentTime.Hour >= 6 && (currentTime.Minute - lastAnimateMinute > 3 || lastAnimateMinute > currentTime.Minute))
@@ -993,11 +988,9 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
     // Open up the menu UI
     if (menuIdx == MENUIDX_INSPECT)
     {
-      hasStatusDisplay = true;
+      gameState = GameState::StatusCheck;
       didPerformAction = true;
     }
-    else
-      hasStatusDisplay = false;
     // Start stroking
     if (menuIdx == MENUIDX_STROKE)
     {
@@ -1089,6 +1082,53 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
     showWatchFace(true);
     return true;
   }
+  return false;
+}
+
+void Watchytchi::statusCheck_draw()
+{
+  drawBgEnvironment();
+  drawIdleCreature(false);
+  drawDebugClock();
+  drawPoop();
+  drawPlaymate(idleAnimIdx);
+  auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
+  int moodleIdx = 0;
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_FoodHappy, img_MoodleIcon_FoodSad, foodHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_StrokeHappy, img_MoodleIcon_StrokeHappy, strokeHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_WalkHappy, img_MoodleIcon_WalkHappy, walkHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_PoopHappy, img_MoodleIcon_PoopSad, poopHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_SleepHappy, img_MoodleIcon_SleepSad, sleepHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_PlaymateHappy, img_MoodleIcon_PlaymateHappy, playmateHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_HotSpringsHappy, img_MoodleIcon_HotSpringsHappy, hotSpringsHappy.value);
+
+  auto happyTier = getHappyTier();
+  if (happyTier == HappyTier::Blissful)
+    display.drawBitmap(85, 80, img_HappinessMoodle_Blissful, 30, 30, color_fg);
+  else if (happyTier == HappyTier::Happy)
+    display.drawBitmap(85, 80, img_HappinessMoodle_Happy, 30, 30, color_fg);
+  else if (happyTier == HappyTier::Neutral)
+    display.drawBitmap(85, 80, img_HappinessMoodle_Neutral, 30, 30, color_fg);
+  else
+    display.drawBitmap(85, 80, img_HappinessMoodle_Sad, 30, 30, color_fg);
+
+  // HappyContributor foodHappy = HappyContributor(0.25f,  -0.334f, 0.4f);
+  // HappyContributor strokeHappy = HappyContributor(0.f,  0.f, 0.334f);
+  // HappyContributor walkHappy = HappyContributor(0.f,  0.f, 0.334f);
+  // HappyContributor poopHappy = HappyContributor(0.f,  -0.334f, 0.2f);
+  // HappyContributor sleepHappy = HappyContributor(0.f,  -0.334f, 0.f);
+  // HappyContributor playmateHappy = HappyContributor(0.f,  0.f, 0.2f);
+  // HappyContributor hotSpringsHappy = HappyContributor(0.f,  0.f, 0.2f);
+}
+
+bool Watchytchi::statusCheck_handleButtonPress(uint64_t wakeupBit)
+{
+  if (IS_KEY_CURSOR || IS_KEY_SELECT || IS_KEY_CANCEL)
+  {
+    gameState = GameState::BaseMenu;
+    return true;
+  }
+
   return false;
 }
 

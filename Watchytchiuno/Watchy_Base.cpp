@@ -10,7 +10,6 @@ RTC_DATA_ATTR int lastSaveTs = -1;
 /*## State: UI ##*/
 RTC_DATA_ATTR int menuIdx;
 RTC_DATA_ATTR int lastAdvanceIdxMinute = 0;
-RTC_DATA_ATTR bool hasStatusDisplay = false;
 RTC_DATA_ATTR bool invertColors = false;
 
 /*## State: Saveable pet stats ##*/
