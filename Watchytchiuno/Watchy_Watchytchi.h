@@ -56,7 +56,7 @@ class Watchytchi : public WatchyBase{
         bool tryDrawMoodle(int& idx, const unsigned char* happyIcon, const unsigned char* sadIcon, float happyLevel);
         void drawIdleCreature(bool isAnimating);
         void drawEatAnim();
-        void drawPlaymate(int idleIdx);
+        void drawPlaymate(int idleIdx, int xOffset = 0, int yOffset = 0);
         void drawAgeFlower();
         void drawDebugClock();
         void drawPoop();

@@ -871,7 +871,7 @@ void Watchytchi::drawEatAnim(){
      }
 }
 
-void Watchytchi::drawPlaymate(int idleIdx)
+void Watchytchi::drawPlaymate(int idleIdx, int xOffset, int yOffset)
 {
   if (!hasActivePlaymate())
     return;
@@ -886,18 +886,18 @@ void Watchytchi::drawPlaymate(int idleIdx)
   if (activePlaymate == PlaymateSpecies::JuncoSnake)
   {
     if (gameState == GameState::Eating)
-      display.drawBitmap(120, 94, idleIdx % 2 == 0 ? img_Playmate_JuncoSnake_Eating1 : img_Playmate_JuncoSnake_Eating2, 106, 72, color_fg);
+      display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_JuncoSnake_Eating1 : img_Playmate_JuncoSnake_Eating2, 106, 72, color_fg);
     else
-      display.drawBitmap(120, 94, idleIdx % 2 == 0 ? img_Playmate_JuncoSnake_Idle1 : img_Playmate_JuncoSnake_Idle2, 106, 72, color_fg);
+      display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_JuncoSnake_Idle1 : img_Playmate_JuncoSnake_Idle2, 106, 72, color_fg);
   }
   else if (activePlaymate == PlaymateSpecies::SnappyLog)
-    display.drawBitmap(120, 94, idleIdx % 2 == 0 ? img_Playmate_SnappyLog_Idle1 : img_Playmate_SnappyLog_Idle2, 106, 72, color_fg);
+    display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_SnappyLog_Idle1 : img_Playmate_SnappyLog_Idle2, 106, 72, color_fg);
   else if (activePlaymate == PlaymateSpecies::BugRat)
   {
     if (gameState == GameState::Eating)
-      display.drawBitmap(120, 94, idleIdx % 2 == 0 ? img_Playmate_BugRat_Eating1 : img_Playmate_BugRat_Eating2, 106, 72, color_fg);
+      display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_BugRat_Eating1 : img_Playmate_BugRat_Eating2, 106, 72, color_fg);
     else
-      display.drawBitmap(120, 94, idleIdx % 2 == 0 ? img_Playmate_BugRat_Idle1 : img_Playmate_BugRat_Idle2, 106, 72, color_fg);
+      display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_BugRat_Idle1 : img_Playmate_BugRat_Idle2, 106, 72, color_fg);
   }
 }
 
@@ -1363,6 +1363,10 @@ void Watchytchi::hotSpringsTimer_draw()
     display.drawBitmap(0, 0, img_HotSpringsEnvironment_Rest, 200, 200, color_fg);  
   else
     display.drawBitmap(0, 0, img_HotSpringsBackground_Focused, 200, 200, color_fg);  
+  
+  idleAnimIdx++;
+  if (hasActivePlaymate() && !isHotSpringsTimerOnBreak)
+        drawPlaymate(idleAnimIdx, 25, -10);
 
   auto roundedTimer = ceil(hotSpringsTimerSecsLeft / 60.f);
   int tensDigit = floor(roundedTimer / 10);
@@ -1372,24 +1376,24 @@ void Watchytchi::hotSpringsTimer_draw()
   {
     if (isHotSpringsTimerOnBreak)
     {
-      display.drawBitmap(19, 37, img_HotSpringWaterSymbol, 68, 46, color_fg);
-      display.drawBitmap(19, 37, img_HotSpringWaterSymbol_Inner, 68, 46, color_bg);
+      display.drawBitmap(19, 67, img_HotSpringWaterSymbol, 70, 48, color_fg);
+      display.drawBitmap(19, 67, img_HotSpringWaterSymbol_Inner, 70, 48, color_bg);
     }
     else
     {
-      display.drawBitmap(19, 37, img_HotSpringHeatSymbol, 68, 46, color_fg);
-      display.drawBitmap(19, 37, img_HotSpringHeatSymbol_Inner, 68, 46, color_bg);
+      display.drawBitmap(19, 67, img_HotSpringHeatSymbol, 70, 48, color_fg);
+      display.drawBitmap(19, 67, img_HotSpringHeatSymbol_Inner, 70, 48, color_bg);
     }
   }
   else
   {
-    display.drawBitmap(19, 37, img_HotSpringPauseSymbol, 68, 46, color_fg);
-    display.drawBitmap(19, 37, img_HotSpringPauseSymbol_Inner, 68, 46, color_bg);
+    display.drawBitmap(19, 67, img_HotSpringPauseSymbol, 70, 48, color_fg);
+    display.drawBitmap(19, 67, img_HotSpringPauseSymbol_Inner, 70, 48, color_bg);
   }
-  display.drawBitmap(80, 30, hotSpring_nums[tensDigit], 50, 60, color_fg);
-  display.drawBitmap(80, 30, hotSpring_nums_inner[tensDigit], 50, 60, color_bg);
-  display.drawBitmap(124, 30, hotSpring_nums[onesDigit], 50, 60, color_fg);
-  display.drawBitmap(124, 30, hotSpring_nums_inner[onesDigit], 50, 60, color_bg);
+  display.drawBitmap(80, 60, hotSpring_nums[tensDigit], 50, 60, color_fg);
+  display.drawBitmap(80, 60, hotSpring_nums_inner[tensDigit], 50, 60, color_bg);
+  display.drawBitmap(124, 60, hotSpring_nums[onesDigit], 50, 60, color_fg);
+  display.drawBitmap(124, 60, hotSpring_nums_inner[onesDigit], 50, 60, color_bg);
   DBGPrintF("tens digit is "); DBGPrint(tensDigit); DBGPrintF(", ones digit is "); DBGPrint(onesDigit); DBGPrintln();
   DBGPrintF("Hot Springs seconds left: "); DBGPrint(hotSpringsTimerSecsLeft); DBGPrintln();
 
