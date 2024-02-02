@@ -1362,7 +1362,10 @@ void Watchytchi::hotSpringsTimer_draw()
   if (isHotSpringsTimerOnBreak)
     display.drawBitmap(0, 0, img_HotSpringsEnvironment_Rest, 200, 200, color_fg);  
   else
+  {
     display.drawBitmap(0, 0, img_HotSpringsBackground_Focused, 200, 200, color_fg);  
+    critter->DrawHotSpringsPose(idleAnimIdx, false);
+  }
   
   idleAnimIdx++;
   if (hasActivePlaymate() && !isHotSpringsTimerOnBreak)
