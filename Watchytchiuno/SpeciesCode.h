@@ -27,6 +27,11 @@ class SpeciesBase
     virtual void DrawCloseUpFrame(int idleIdx, bool isAnimating) = 0;
     virtual void DrawRunningAwayIdle() = 0;
     virtual void DrawRunningAwayWalking(int idleIdx, int xOffset) = 0;
+    virtual void DrawGoodEndPackedBags(int idleIdx) = 0;
+    virtual void DrawGoodEndHike(int idleIdx) = 0;
+    virtual void DrawGoodEndHug(int idleIdx) = 0;
+    virtual void DrawGoodEndIntroBonfire(int idleIdx) = 0;
+    virtual void DrawGoodEndOutroBonfire(int idleIdx) = 0;
 };
 
 class DaisyHog : public SpeciesBase
@@ -46,6 +51,11 @@ class DaisyHog : public SpeciesBase
   void DrawCloseUpFrame(int idleIdx, bool isAnimating) override;
   void DrawRunningAwayIdle() override;
   void DrawRunningAwayWalking(int idleIdx, int xOffset) override;
+  void DrawGoodEndPackedBags(int idleIdx) override;
+  void DrawGoodEndHike(int idleIdx) override;
+  void DrawGoodEndHug(int idleIdx) override;
+  void DrawGoodEndIntroBonfire(int idleIdx) override;
+  void DrawGoodEndOutroBonfire(int idleIdx) override;
 };
 
 class MugSnake : public SpeciesBase
@@ -65,6 +75,11 @@ class MugSnake : public SpeciesBase
   void DrawCloseUpFrame(int idleIdx, bool isAnimating) override;
   void DrawRunningAwayIdle() override;
   void DrawRunningAwayWalking(int idleIdx, int xOffset) override;
+    void DrawGoodEndPackedBags(int idleIdx) override;
+  void DrawGoodEndHike(int idleIdx) override;
+  void DrawGoodEndHug(int idleIdx) override;
+  void DrawGoodEndIntroBonfire(int idleIdx) override;
+  void DrawGoodEndOutroBonfire(int idleIdx) override;
 };
 
 class DeerSlug : public SpeciesBase
@@ -84,4 +99,10 @@ class DeerSlug : public SpeciesBase
   void DrawCloseUpFrame(int idleIdx, bool isAnimating) override;
   void DrawRunningAwayIdle() override;
   void DrawRunningAwayWalking(int idleIdx, int xOffset) override;
+  void DrawGoodEndPackedBags(int idleIdx) override;
+  void DrawGoodEndHike(int idleIdx) override;
+  void DrawGoodEndHug(int idleIdx) override;
+  void DrawGoodEndIntroBonfire(int idleIdx) override;
+  void DrawGoodEndOutroBonfire(int idleIdx) override;
+
 };

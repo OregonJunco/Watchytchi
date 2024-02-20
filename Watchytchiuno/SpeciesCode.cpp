@@ -111,6 +111,35 @@ void DaisyHog::DrawRunningAwayWalking(int idleIdx, int xOffset)
   owner->display.drawBitmap(xOffset + 100 - 45, 110, idleIdx % 2 == 0 ? img_DaisyHog_RunningAway_Walking1 : img_DaisyHog_RunningAway_Walking2, 95, 55, getColor_fg());
 }
 
+void DaisyHog::DrawGoodEndPackedBags(int idleIdx)
+{
+  owner->display.drawBitmap(0, 0, img_GoodEnd_DaisyHog_PackedBags, 200, 200, GxEPD_BLACK);
+}
+
+void DaisyHog::DrawGoodEndHike(int idleIdx)
+{
+  owner->display.drawBitmap(0, 0, idleIdx == 0 ? img_GoodEnd_DaisyHog_Hike1 : img_GoodEnd_DaisyHog_Hike2, 200, 200, GxEPD_BLACK);
+}
+
+void DaisyHog::DrawGoodEndHug(int idleIdx)
+{
+  if (idleIdx == 0)
+    owner->display.drawBitmap(0, 0, img_GoodEnd_DaisyHog_HugIntro, 200, 200, GxEPD_BLACK);
+  else
+    owner->display.drawBitmap(0, 0, idleIdx == 1 ? img_GoodEnd_DaisyHog_Hugging1 : img_GoodEnd_DaisyHog_Hugging2, 200, 200, GxEPD_BLACK);
+}
+
+void DaisyHog::DrawGoodEndIntroBonfire(int idleIdx)
+{
+  owner->display.drawBitmap(0, 0, idleIdx == 0 ? img_GoodEnd_DaisyHog_IntroBonfire1 : img_GoodEnd_DaisyHog_IntroBonfire2, 200, 200, GxEPD_BLACK);
+}
+
+void DaisyHog::DrawGoodEndOutroBonfire(int idleIdx)
+{
+  owner->display.drawBitmap(0, 0, idleIdx == 0 ? img_GoodEnd_DaisyHog_OutroBonfire1 : img_GoodEnd_DaisyHog_OutroBonfire2, 200, 200, GxEPD_BLACK);
+}
+
+
 /*# ==== MUGSNAKE ====
        _____y
       / _*_/
@@ -211,6 +240,34 @@ void MugSnake::DrawRunningAwayWalking(int idleIdx, int xOffset)
   owner->display.drawBitmap(xOffset + 100 - 45, 97, idleIdx % 2 == 0 ? img_MugSnake_RunningAway_Walk1 : img_MugSnake_RunningAway_Walk2, 95, 75, getColor_fg());
 }
 
+void MugSnake::DrawGoodEndPackedBags(int idleIdx)
+{
+  owner->display.drawBitmap(0, 0, img_GoodEnd_MugSnake_PackedBags, 200, 200, GxEPD_BLACK);
+}
+
+void MugSnake::DrawGoodEndHike(int idleIdx)
+{
+  owner->display.drawBitmap(0, 0, idleIdx == 0 ? img_GoodEnd_MugSnake_Hike1 : img_GoodEnd_MugSnake_Hike2, 200, 200, GxEPD_BLACK);
+}
+
+void MugSnake::DrawGoodEndHug(int idleIdx)
+{
+  if (idleIdx == 0)
+    owner->display.drawBitmap(0, 0, img_GoodEnd_MugSnake_HugIntro, 200, 200, GxEPD_BLACK);
+  else
+    owner->display.drawBitmap(0, 0, idleIdx == 1 ? img_GoodEnd_MugSnake_Hugging1 : img_GoodEnd_MugSnake_Hugging2, 200, 200, GxEPD_BLACK);
+}
+
+void MugSnake::DrawGoodEndIntroBonfire(int idleIdx)
+{
+  owner->display.drawBitmap(0, 0, idleIdx == 0 ? img_GoodEnd_MugSnake_IntroBonfire1 : img_GoodEnd_MugSnake_IntroBonfire2, 200, 200, GxEPD_BLACK);
+}
+
+void MugSnake::DrawGoodEndOutroBonfire(int idleIdx)
+{
+  owner->display.drawBitmap(0, 0, idleIdx == 0 ? img_GoodEnd_MugSnake_OutroBonfire1 : img_GoodEnd_MugSnake_OutroBonfire2, 200, 200, GxEPD_BLACK);
+}
+
 /*# ==== DEERSLUG ====
                  0
            \ ___/
@@ -297,4 +354,29 @@ void DeerSlug::DrawRunningAwayIdle()
 void DeerSlug::DrawRunningAwayWalking(int idleIdx, int xOffset)
 {
   // Babies can't run away
+}
+
+void DeerSlug::DrawGoodEndPackedBags(int idleIdx)
+{
+  // No ending for babies
+}
+
+void DeerSlug::DrawGoodEndHike(int idleIdx)
+{
+  // No ending for babies
+}
+
+void DeerSlug::DrawGoodEndHug(int idleIdx)
+{
+  // No ending for babies
+}
+
+void DeerSlug::DrawGoodEndIntroBonfire(int idleIdx)
+{
+  // No ending for babies
+}
+
+void DeerSlug::DrawGoodEndOutroBonfire(int idleIdx)
+{
+  // No ending for babies
 }

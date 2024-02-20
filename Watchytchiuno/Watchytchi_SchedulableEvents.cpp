@@ -217,7 +217,7 @@ void Watchytchi::ending_draw()
     else
     {
       display.fillScreen(GxEPD_WHITE);
-      display.drawBitmap(0, 0, img_GoodEnd_DaisyHog_PackedBags, 200, 200, GxEPD_BLACK);
+      critter->DrawGoodEndPackedBags(0);
     }
   }
   /*# Ending animation! #*/
@@ -286,7 +286,7 @@ void Watchytchi::ending_draw()
       // Phase 0: Show the packed bags a little longer
       vibrate(1, 30);
       display.fillScreen(GxEPD_WHITE);
-      display.drawBitmap(0, 0, img_GoodEnd_DaisyHog_PackedBags, 200, 200, GxEPD_BLACK);
+      critter->DrawGoodEndPackedBags(0);
       display.display(true);
       delay(1000);
 
@@ -295,7 +295,7 @@ void Watchytchi::ending_draw()
       for (auto i = 0; i < 10; i++)
       {
         display.fillScreen(GxEPD_WHITE);
-        display.drawBitmap(0, 0, i % 2 == 0 ? img_GoodEnd_DaisyHog_Hike1 : img_GoodEnd_DaisyHog_Hike2, 200, 200, GxEPD_BLACK);
+        critter->DrawGoodEndHike(i % 2);
         display.display(true);
       }
       delay(2000);
@@ -305,7 +305,7 @@ void Watchytchi::ending_draw()
       for (auto i = 0; i < 24; i++)
       {
         display.fillScreen(GxEPD_WHITE);
-        display.drawBitmap(0, 0, i % 2 == 0 ? img_GoodEnd_DaisyHog_IntroBonfire1 : img_GoodEnd_DaisyHog_IntroBonfire2, 200, 200, GxEPD_BLACK);
+        critter->DrawGoodEndIntroBonfire(i % 2);
         if (i < 3)
           display.fillScreen(GxEPD_BLACK);
         else if (i < 6)
@@ -321,13 +321,13 @@ void Watchytchi::ending_draw()
       // Phase 3: Hug the caretaker goodbye :')
       vibrate(1, 50);
       display.fillScreen(GxEPD_WHITE);
-      display.drawBitmap(0, 0, img_GoodEnd_DaisyHog_HugIntro, 200, 200, GxEPD_BLACK);
+      critter->DrawGoodEndHug(0);
       display.display(true);
       delay(2000);
       for (auto i = 0; i < 10; i++)
       {
         display.fillScreen(GxEPD_WHITE);
-        display.drawBitmap(0, 0, i % 2 == 0 ? img_GoodEnd_DaisyHog_Hugging1 : img_GoodEnd_DaisyHog_Hugging2, 200, 200, GxEPD_BLACK);
+        critter->DrawGoodEndHug(i % 2 == 0 ? 1 : 2);
         display.display(true);
         vibrate(1, 10);
       }
@@ -338,7 +338,7 @@ void Watchytchi::ending_draw()
       for (auto i = 0; i < 24; i++)
       {
         display.fillScreen(GxEPD_WHITE);
-        display.drawBitmap(0, 0, i % 2 == 0 ? img_GoodEnd_DaisyHog_OutroBonfire1 : img_GoodEnd_DaisyHog_OutroBonfire2, 200, 200, GxEPD_BLACK);
+        critter->DrawGoodEndOutroBonfire(i % 2);
         
         if (i >= 21)
           display.fillScreen(GxEPD_BLACK);
