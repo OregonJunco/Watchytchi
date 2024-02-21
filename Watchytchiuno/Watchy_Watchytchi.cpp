@@ -1360,16 +1360,21 @@ void Watchytchi::hotSpringsTimer_draw()
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
   auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
   if (isHotSpringsTimerOnBreak)
-    display.drawBitmap(0, 0, img_HotSpringsEnvironment_Rest, 200, 200, color_fg);  
+  {
+    display.drawBitmap(0, 0, img_HotSpringsBackground_Rest, 200, 200, color_fg);  
+    critter->DrawHotSpringsPose(idleAnimIdx, true);
+    if (hasActivePlaymate())
+      drawPlaymate(idleAnimIdx, -100, -10);
+  }
   else
   {
+    idleAnimIdx++;
     display.drawBitmap(0, 0, img_HotSpringsBackground_Focused, 200, 200, color_fg);  
     critter->DrawHotSpringsPose(idleAnimIdx, false);
+    if (hasActivePlaymate())
+      drawPlaymate(idleAnimIdx, 25, -10);
   }
   
-  idleAnimIdx++;
-  if (hasActivePlaymate() && !isHotSpringsTimerOnBreak)
-        drawPlaymate(idleAnimIdx, 25, -10);
 
   auto roundedTimer = ceil(hotSpringsTimerSecsLeft / 60.f);
   int tensDigit = floor(roundedTimer / 10);
