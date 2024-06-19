@@ -53,6 +53,7 @@ void Watchytchi::drawWatchFace(){
   if (Watchy::RTC.rtcType == DS3231) {
     Watchy::RTC.rtc_ds.clearAlarm(DS3232RTC::ALARM_1);
   }
+  srand(makeTime(currentTime));
 
   /*# Load Data: #*/
   tryLoadSaveData(false);
@@ -77,6 +78,7 @@ void Watchytchi::handleButtonPress() {
     }
   }
   RTC.read(currentTime);
+  srand(makeTime(currentTime) + 1);
   tryLoadSaveData(false);
   // Call the active handle button press function depending on my gamestate
   auto didHandlePress = (this->*handleButtonFuncsByState[(int)gameState])(wakeupBit);
@@ -318,7 +320,6 @@ void Watchytchi::tickCreatureState()
   // Grow up into a bigger critter!
   if (species == CreatureSpecies::Deer && numSecondsAlive >= 2.5 * 24 * 60 * 60)
   {
-    srand(lastUpdateTsEpoch);
     species = rand() % 2 == 0 ? CreatureSpecies::Hog : CreatureSpecies::Snake;
   }
 
@@ -335,7 +336,6 @@ void Watchytchi::tickCreatureState()
       // Endings are only defined for adults, so forcibly grow up if I'm not an adult
       if (species == CreatureSpecies::Deer)
       {
-        srand(currentEpochTime);
         species = rand() % 2 == 0 ? CreatureSpecies::Hog : CreatureSpecies::Snake;
         loadFromRTC();
       }
@@ -494,7 +494,6 @@ void Watchytchi::tickCreatureState()
     // HACK: we do this at the same time as pooping because it's roughly the same frequency that we want to check at
     if (!hasActivePlaymate() && befriendedPlaymatesMask != 0)
     {
-      srand(lastUpdateTsEpoch);
       if (rand() % 4 == 0)
         chooseNewActivePlaymate(true);
     }
@@ -581,20 +580,29 @@ bool Watchytchi::isElectricLit()
 void Watchytchi::chooseNewActivePlaymate(bool onlyBefriended)
 {
   // If I have a best friend, they are more likely to join me
-  srand(lastUpdateTsEpoch);
+  DBGPrintF("=======Playmate Choice: seeded random with TS "); DBGPrint(lastUpdateTsEpoch);
+  DBGPrintF(", best friend is "); DBGPrint(bestFriendPlaymate);
   if (bestFriendPlaymate != PlaymateSpecies::NoPlaymate && rand() % 2 == 0)
+  {
     activePlaymate = bestFriendPlaymate;
+    DBGPrintF(" and I chose to hang with them, ");
+  }
   // Choose random playmate
   else
   {
     auto newPmIdx = rand() % (int)PlaymateSpecies::NUMPLAYMATES;
+    DBGPrint("I chose a random playmate "); DBGPrint(newPmIdx); 
     // If I'm only supposed to choose befriended ones, budge the int until I choose a befriended playmate
     if (onlyBefriended && befriendedPlaymatesMask != 0)
     {
       while (0 == ((1 << newPmIdx) & befriendedPlaymatesMask))
+      {
         newPmIdx = (newPmIdx + 1) % (int)PlaymateSpecies::NUMPLAYMATES;
+        DBGPrintF(", shifted it to "); DBGPrint(newPmIdx); DBGPrintF(" to enforce only befriended, "); 
+      }
     }
     activePlaymate = (PlaymateSpecies)newPmIdx;
+    DBGPrintF(", and my final playmate is "); DBGPrint(newPmIdx);
   }
 
   lastPlaymateJoinTs = lastUpdateTsEpoch;
@@ -603,9 +611,11 @@ void Watchytchi::chooseNewActivePlaymate(bool onlyBefriended)
   if (bestFriendPlaymate == PlaymateSpecies::NoPlaymate)
   {
     // Potential of this playmate becoming my new best friend!
-    srand(lastUpdateTsEpoch);
     if (rand() % 3 == 0)
+    {
+      DBGPrintF(", and I made them my new best friend!"); DBGPrintln();
       bestFriendPlaymate = activePlaymate; 
+    }
   }
 }
 
@@ -840,7 +850,6 @@ void Watchytchi::drawEatAnim(){
     int numFrames;
     const int BERRIES = 0;
     const int CUCUMBER = 1;
-    srand(lastUpdateTsEpoch);
     if (rand() % 2 == 0)
     {
       foodType = BERRIES;
@@ -898,6 +907,10 @@ void Watchytchi::drawPlaymate(int idleIdx, int xOffset, int yOffset)
       display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_BugRat_Eating1 : img_Playmate_BugRat_Eating2, 106, 72, color_fg);
     else
       display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_BugRat_Idle1 : img_Playmate_BugRat_Idle2, 106, 72, color_fg);
+  }
+  else if (activePlaymate == PlaymateSpecies::SmokerBird)
+  {
+    display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_CoolBird_Idle1 : img_Playmate_CoolBird_Idle2, 106, 72, color_fg);
   }
 }
 
@@ -1237,6 +1250,7 @@ void Watchytchi::sharedWalk_draw()
     else
       display.drawBitmap(i * flowerWidth, 170, img_WalkingFlower_Bud, 25, 30, GxEPD_BLACK);
   }
+  srand(lastUpdateTsEpoch + 2);
 
   // Draw raw # of steps (TODO: decide whether this is debug or permanent)
   display.setFont(&FreeMonoBold9pt7b);
@@ -1257,7 +1271,6 @@ void Watchytchi::sharedWalk_draw()
     walkHappy.AddTo(happinessToAdd);
 
     // Every time we add happiness, we have a chance to add a playmate
-    srand(lastUpdateTsEpoch);
     auto shouldGetPlaymate = activePlaymate == PlaymateSpecies::NoPlaymate && rand() % 12 == 0;
     if (shouldGetPlaymate)
     {

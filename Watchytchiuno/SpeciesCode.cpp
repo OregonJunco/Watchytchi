@@ -333,7 +333,7 @@ void DeerSlug::DrawWalkingPose(int idleIdx, bool isAnimating)
 
 void DeerSlug::DrawHotSpringsPose(int idleIdx, bool isOnBreak)
 {
-  owner->display.drawBitmap(0, 0, isOnBreak ? img_DeerSlug_HotSprings : img_DeerSlug_HotSprings_Rest, 200, 200, getColor_fg());
+  owner->display.drawBitmap(0, 0, isOnBreak ? img_DeerSlug_HotSprings_Rest : img_DeerSlug_HotSprings, 200, 200, getColor_fg());
 }
 
 void DeerSlug::DrawPosingQuestionPose(int idleIdx, bool isAnimating)
