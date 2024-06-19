@@ -908,6 +908,10 @@ void Watchytchi::drawPlaymate(int idleIdx, int xOffset, int yOffset)
     else
       display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_BugRat_Idle1 : img_Playmate_BugRat_Idle2, 106, 72, color_fg);
   }
+  else if (activePlaymate == PlaymateSpecies::SmokerBird)
+  {
+    display.drawBitmap(xOffset + 120, yOffset + 94, idleIdx % 2 == 0 ? img_Playmate_CoolBird_Idle1 : img_Playmate_CoolBird_Idle2, 106, 72, color_fg);
+  }
 }
 
 void Watchytchi::drawAgeFlower()
