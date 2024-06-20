@@ -968,6 +968,7 @@ void Watchytchi::baseMenu_draw()
   drawWeather();
   drawAllUIButtons();
   drawDebugClock();
+  drawPoop();
 
   // Animate an idle loop every 3 minutes
   if (currentTime.Hour >= 6 && (currentTime.Minute - lastAnimateMinute > 3 || lastAnimateMinute > currentTime.Minute))
@@ -992,9 +993,7 @@ void Watchytchi::baseMenu_draw()
       drawPlaymate(idleAnimIdx);
     else
       drawAgeFlower();
-  }
-
-  drawPoop();    
+  }    
 }
 
 bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
@@ -1529,7 +1528,7 @@ void Watchytchi::reading_draw()
   if (submenuIdx < k_readingLength - 1)
     display.drawBitmap(196, 0, img_StrokingButtonPrompt_R, 6, 46, GxEPD_BLACK);
 
-  drawIdleCreature(false);
+  critter->DrawReadingPose(idleAnimIdx, false);
   drawPlaymate(idleAnimIdx);
   drawPoop();
 }
