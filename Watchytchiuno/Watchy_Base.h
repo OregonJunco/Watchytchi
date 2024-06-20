@@ -13,7 +13,7 @@
 enum CreatureSpecies {Hog, Snake, Deer, COUNT};
 enum ScheduledAlertType {None, CloseUp, AskAboutDay};
 enum GameState {BaseMenu, StatusCheck, Eating, AlertInteraction, StrokingMode, HowWasYourDay, Ending, SharedWalk,
-    ActivitySelection, HotSpringsTimer, CNT};
+    ActivitySelection, HotSpringsTimer, Reading, CNT};
 enum PlaymateSpecies {NoPlaymate = -1, JuncoSnake = 0, SnappyLog = 1, BugRat = 2, SmokerBird = 3, NUMPLAYMATES};
 /*
 enum PlaymateSpecies {None = -1, JuncoSnake, LogGator, BeerPenguin, GooseHydra, PetRock, KingSnake, EyeFrog, RockHider,

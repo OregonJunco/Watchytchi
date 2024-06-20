@@ -3,6 +3,12 @@
 #include <stdlib.h>     //srand, rand
 #include "SpeciesCode.h"
 #include <cmath>
+#include "ReadingMaterial.h"
+
+#include "fonts/Tintin_Dialogue8pt7b.h"
+#include "fonts/Tintin_Dialogue9pt7b.h"
+#include "fonts/Tintin_Dialogue10pt7b.h"
+#include "fonts/Tintin_Dialogue16pt7b.h"
 
 const unsigned char *dk_nums [10] = {dk0, dk1, dk2, dk3, dk4, dk5, dk6, dk7, dk8, dk9};
 const unsigned char *foodBerry_stages[7] = {img_FoodBerry_Stage0, img_FoodBerry_Stage1, img_FoodBerry_Stage2, img_FoodBerry_Stage3, 
@@ -1317,9 +1323,10 @@ void Watchytchi::activitySelect_draw()
   // Draw activity options
   auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
-  display.drawBitmap(57, 83, img_MenuIcon_Walk_Active, 32, 32, color_fg);
-  display.drawBitmap(95, 83, img_MenuIcon_HotSprings_Active, 32, 32, color_fg);
-  auto cursorX = 66 + 38 * submenuIdx;
+  display.drawBitmap(41, 83, submenuIdx == 0 ? img_MenuIcon_Walk_Active : img_MenuIcon_Walk_Inactive, 32, 32, color_fg);
+  display.drawBitmap(78, 83, submenuIdx == 1 ? img_MenuIcon_HotSprings_Active : img_MenuIcon_HotSprings_Inactive, 32, 32, color_fg);
+  display.drawBitmap(115, 83, submenuIdx == 2 ? img_MenuIcon_Read_Active : img_MenuIcon_Read_Inactive, 32, 32, color_fg);
+  auto cursorX = 50 + 38 * submenuIdx;
   display.drawBitmap(cursorX, 69, img_MoodSelectionCursor, 12, 12, color_fg);
   
   drawIdleCreature(false);
@@ -1331,12 +1338,12 @@ bool Watchytchi::activitySelect_handleButtonPress(uint64_t wakeupBit)
 {
   if (IS_KEY_CURSOR)
   {
-    submenuIdx = (submenuIdx + 1) % 2;
+    submenuIdx = (submenuIdx + 1) % 3;
     showWatchFace(true);
     return true;
   }
 
-  const int AIDX_SHAREDWALK = 0, AIDX_HOTSPRINGSTIMER = 1;
+  const int AIDX_SHAREDWALK = 0, AIDX_HOTSPRINGSTIMER = 1, AIDX_READING = 2;
   if (IS_KEY_SELECT)
   {
     if (submenuIdx == AIDX_SHAREDWALK)
@@ -1351,6 +1358,11 @@ bool Watchytchi::activitySelect_handleButtonPress(uint64_t wakeupBit)
       isHotSpringsTimerPlaying = true;
       isHotSpringsTimerOnBreak = false;
       gameState = GameState::HotSpringsTimer;
+    }
+    else if (submenuIdx == AIDX_READING)
+    {
+      submenuIdx = 0;
+      gameState = GameState::Reading;
     }
     showWatchFace(true);
     return true;
@@ -1495,6 +1507,55 @@ bool Watchytchi::hotSpringsTimer_handleButtonPress(uint64_t wakeupBit)
       gameState = GameState::BaseMenu;
     }
 
+    showWatchFace(true);
+    return true;
+  }
+  return false;
+}
+
+void Watchytchi::reading_draw()
+{
+  drawBgEnvironment();
+  display.setFont(&Tintin_Dialogue10pt7b);
+  display.setTextColor(GxEPD_BLACK);
+  display.setCursor(14, 20);
+  display.setTextWrap(true);
+  display.println(txt_velveteenIntro[submenuIdx]);
+
+  display.drawBitmap(0, 160, img_ReadingFirstPersonBookEdge, 200, 40, GxEPD_BLACK);
+
+  if (submenuIdx > 0)
+    display.drawBitmap(-2, 0, img_StrokingButtonPrompt_L, 6, 46, GxEPD_BLACK);
+  if (submenuIdx < k_readingLength - 1)
+    display.drawBitmap(196, 0, img_StrokingButtonPrompt_R, 6, 46, GxEPD_BLACK);
+
+  drawIdleCreature(false);
+  drawPlaymate(idleAnimIdx);
+  drawPoop();
+}
+
+bool Watchytchi::reading_handleButtonPress(uint64_t wakeupBit)
+{
+  if (IS_KEY_CURSOR)
+  {
+    submenuIdx = max(submenuIdx - 1, 0);
+    idleAnimIdx++;
+    showWatchFace(true);
+    return true;
+  }
+
+  if (IS_KEY_SELECT)
+  {
+    submenuIdx = min(submenuIdx + 1, k_readingLength - 1);
+    idleAnimIdx++;
+    showWatchFace(true);
+    return true;
+  }
+
+  if (IS_KEY_CANCEL)
+  {
+    gameState = GameState::BaseMenu;
+    lastAnimateMinute = -1;
     showWatchFace(true);
     return true;
   }
