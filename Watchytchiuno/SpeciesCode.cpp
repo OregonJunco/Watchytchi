@@ -91,6 +91,12 @@ void DaisyHog::DrawHotSpringsPose(int idleIdx, bool isOnBreak)
   owner->display.drawBitmap(0, 0, isOnBreak ? img_DaisyHog_HotSprings_Rest : img_DaisyHog_HotSprings, 200, 200, getColor_fg());
 }
 
+void DaisyHog::DrawReadingPose(int idleIdx, bool isAnimating)
+{
+  // Lie on back!
+  owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 110 + 4, idleIdx % 2 == 0 ? img_DaisyHog_SkyGaze1 : img_DaisyHog_SkyGaze2, 72, 55, getColor_fg());
+}
+
 void DaisyHog::DrawPosingQuestionPose(int idleIdx, bool isAnimating)
 {
   owner->display.drawBitmap(100 - 36, 110, img_DaisyHog_PosingQuestion, 72, 55, getColor_fg());
@@ -219,6 +225,11 @@ void MugSnake::DrawHotSpringsPose(int idleIdx, bool isOnBreak)
   owner->display.drawBitmap(0, 0, isOnBreak ? img_MugSnake_HotSprings_Rest : img_MugSnake_HotSprings, 200, 200, getColor_fg());
 }
 
+void MugSnake::DrawReadingPose(int idleIdx, bool isAnimating)
+{
+  owner->display.drawBitmap(owner->getPlaymateXOffset() + 100 - 36, 97, idleAnimIdx % 2 == 0 ? img_MugSnake_TippedOverIdle1 : img_MugSnake_TippedOverIdle2, 72, 72, getColor_fg());
+}
+
 void MugSnake::DrawPosingQuestionPose(int idleIdx, bool isAnimating)
 {
   // TODO: bespoke version of animation
@@ -334,6 +345,11 @@ void DeerSlug::DrawWalkingPose(int idleIdx, bool isAnimating)
 void DeerSlug::DrawHotSpringsPose(int idleIdx, bool isOnBreak)
 {
   owner->display.drawBitmap(0, 0, isOnBreak ? img_DeerSlug_HotSprings_Rest : img_DeerSlug_HotSprings, 200, 200, getColor_fg());
+}
+
+void DeerSlug::DrawReadingPose(int idleIdx, bool isAnimating)
+{
+  DrawIdlePose(idleIdx, isAnimating);
 }
 
 void DeerSlug::DrawPosingQuestionPose(int idleIdx, bool isAnimating)

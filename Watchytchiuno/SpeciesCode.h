@@ -23,6 +23,7 @@ class SpeciesBase
     virtual void DrawIdlePose(int idleIdx, bool isAnimating) = 0;
     virtual void DrawWalkingPose(int idleIdx, bool isAnimating) = 0;
     virtual void DrawHotSpringsPose(int idleIdx, bool isAnimating) = 0;
+    virtual void DrawReadingPose(int idleIdx, bool isAnimating) = 0;
     virtual void DrawPosingQuestionPose(int idleIdx, bool isAnimating) = 0;
     virtual void DrawCloseUpFrame(int idleIdx, bool isAnimating) = 0;
     virtual void DrawRunningAwayIdle() = 0;
@@ -47,6 +48,7 @@ class DaisyHog : public SpeciesBase
   void DrawIdlePose(int idleIdx, bool isAnimating) override;
   void DrawWalkingPose(int idleIdx, bool isAnimating) override;
   void DrawHotSpringsPose(int idleIdx, bool isAnimating) override;
+  void DrawReadingPose(int idleIdx, bool isAnimating) override;
   void DrawPosingQuestionPose(int idleIdx, bool isAnimating) override;
   void DrawCloseUpFrame(int idleIdx, bool isAnimating) override;
   void DrawRunningAwayIdle() override;
@@ -71,11 +73,12 @@ class MugSnake : public SpeciesBase
   void DrawIdlePose(int idleIdx, bool isAnimating) override;
   void DrawWalkingPose(int idleIdx, bool isAnimating) override;
   void DrawHotSpringsPose(int idleIdx, bool isAnimating) override;
+  void DrawReadingPose(int idleIdx, bool isAnimating) override;
   void DrawPosingQuestionPose(int idleIdx, bool isAnimating) override;
   void DrawCloseUpFrame(int idleIdx, bool isAnimating) override;
   void DrawRunningAwayIdle() override;
   void DrawRunningAwayWalking(int idleIdx, int xOffset) override;
-    void DrawGoodEndPackedBags(int idleIdx) override;
+  void DrawGoodEndPackedBags(int idleIdx) override;
   void DrawGoodEndHike(int idleIdx) override;
   void DrawGoodEndHug(int idleIdx) override;
   void DrawGoodEndIntroBonfire(int idleIdx) override;
@@ -95,6 +98,7 @@ class DeerSlug : public SpeciesBase
   void DrawIdlePose(int idleIdx, bool isAnimating) override;
   void DrawWalkingPose(int idleIdx, bool isAnimating) override;
   void DrawHotSpringsPose(int idleIdx, bool isAnimating) override;
+  void DrawReadingPose(int idleIdx, bool isAnimating) override;
   void DrawPosingQuestionPose(int idleIdx, bool isAnimating) override;
   void DrawCloseUpFrame(int idleIdx, bool isAnimating) override;
   void DrawRunningAwayIdle() override;
