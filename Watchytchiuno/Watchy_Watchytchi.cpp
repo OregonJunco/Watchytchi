@@ -1122,14 +1122,14 @@ void Watchytchi::statusCheck_draw()
   drawPlaymate(idleAnimIdx);
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
   int moodleIdx = 0;
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_FoodHappy, img_MoodleIcon_FoodSad, foodHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_StrokeHappy, img_MoodleIcon_StrokeHappy, strokeHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_WalkHappy, img_MoodleIcon_WalkHappy, walkHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_PoopHappy, img_MoodleIcon_PoopSad, poopHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_SleepHappy, img_MoodleIcon_SleepSad, sleepHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_PlaymateHappy, img_MoodleIcon_PlaymateHappy, playmateHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_HotSpringsHappy, img_MoodleIcon_HotSpringsHappy, hotSpringsHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_ReadHappy, img_MoodleIcon_ReadHappy, readHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_FoodHappy_Adult, img_MoodleIcon_FoodSad_Adult, foodHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_StrokeHappy_Adult, img_MoodleIcon_StrokeHappy_Adult, strokeHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_WalkHappy_Adult, img_MoodleIcon_WalkHappy_Adult, walkHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_PoopHappy_Adult, img_MoodleIcon_PoopSad_Adult, poopHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_SleepHappy_Adult, img_MoodleIcon_SleepSad_Adult, sleepHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_PlaymateHappy_Adult, img_MoodleIcon_PlaymateHappy_Adult, playmateHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_HotSpringsHappy_Adult, img_MoodleIcon_HotSpringsHappy_Adult, hotSpringsHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_ReadHappy_Adult, img_MoodleIcon_ReadHappy_Adult, readHappy.value);
 
   auto happyTier = getHappyTier();
   if (happyTier == HappyTier::Blissful)
