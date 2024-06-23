@@ -126,6 +126,7 @@ void Watchytchi::tryLoadSaveData(bool force)
   sleepHappy_rtc = NVS.getFloat(nvsKey_sleepHappy, sleepHappy.defaultValue);
   playmateHappy_rtc = NVS.getFloat(nvsKey_playmateHappy, playmateHappy.defaultValue);
   hotSpringsHappy_rtc = NVS.getFloat(nvsKey_hotSpringsHappy, hotSpringsHappy.defaultValue);
+  readHappy_rtc = NVS.getFloat(nvsKey_readHappy, readHappy.defaultValue);
   badEndSeconds = NVS.getInt(nvsKey_badEndSeconds, 0);
   badEndShieldSeconds = NVS.getInt(nvsKey_badEndShieldSeconds, 0);
   hasPoop = 1 == NVS.getInt(nvsKey_hasPoop, 0);
@@ -152,6 +153,7 @@ void Watchytchi::loadFromRTC()
   sleepHappy.value = sleepHappy_rtc;
   playmateHappy.value = playmateHappy_rtc;
   hotSpringsHappy.value = hotSpringsHappy_rtc;
+  readHappy.value = readHappy_rtc;
   
   // Assign creature (TODO: convert to map or enum-linked array)
   if (species == CreatureSpecies::Hog)
@@ -191,6 +193,7 @@ void Watchytchi::tryWriteSaveData(bool force)
   NVS.setFloat(nvsKey_sleepHappy, sleepHappy.value, false);
   NVS.setFloat(nvsKey_playmateHappy, playmateHappy.value, false);
   NVS.setFloat(nvsKey_hotSpringsHappy, hotSpringsHappy.value, false);
+  NVS.setFloat(nvsKey_readHappy, readHappy.value, false);
   NVS.setInt(nvsKey_badEndSeconds, badEndSeconds, false);
   NVS.setInt(nvsKey_badEndShieldSeconds, badEndShieldSeconds, false);
   NVS.setInt(nvsKey_hasPoop, hasPoop ? 1 : 0, false);
@@ -216,6 +219,7 @@ void Watchytchi::writeToRTC()
   sleepHappy_rtc = sleepHappy.value;
   playmateHappy_rtc = playmateHappy.value;
   hotSpringsHappy_rtc = hotSpringsHappy.value;
+  readHappy_rtc = readHappy.value;
 }
 
 void Watchytchi::resetSaveData()
@@ -247,6 +251,8 @@ void Watchytchi::resetSaveData()
   NVS.setFloat(nvsKey_playmateHappy, playmateHappy.defaultValue, false);
   hotSpringsHappy_rtc = hotSpringsHappy.defaultValue;
   NVS.setFloat(nvsKey_hotSpringsHappy, hotSpringsHappy.defaultValue, false);
+  readHappy_rtc = readHappy.defaultValue;
+  NVS.setFloat(nvsKey_readHappy, readHappy.defaultValue, false);
   badEndSeconds = 0;
   NVS.setInt(nvsKey_badEndSeconds, badEndSeconds, false);
   badEndShieldSeconds = 0;
@@ -453,12 +459,16 @@ void Watchytchi::tickCreatureState()
       hotSpringsHappy.AddTo(happyDeltaAmt);
     else
       hotSpringsHappy.MoveTowards(0, happyDeltaAmt * 0.25f);
+
+    // If I'm not reading, atrophy reading happy
+    if (gameState != GameState::Reading)
+      readHappy.MoveTowards(0, happyDeltaAmt * 0.25f); 
   }
 
   lastHappyDelta = getHappyPercent() - oldHappyPercent;
   DBGPrintF("Happy Contributions: food "); DBGPrint(foodHappy.value); DBGPrintF(", stroke "); DBGPrint(strokeHappy.value); 
     DBGPrintF(", walk "); DBGPrint(walkHappy.value); DBGPrintF(", poopHappy "); DBGPrint(poopHappy.value); DBGPrintF(", sleep "); 
-    DBGPrint(sleepHappy.value); DBGPrintF(", playmate "); DBGPrint(playmateHappy.value); DBGPrintF(", hot springs "); DBGPrint(hotSpringsHappy.value); DBGPrintln();
+    DBGPrint(sleepHappy.value); DBGPrintF(", playmate "); DBGPrint(playmateHappy.value); DBGPrintF(", hot springs "); DBGPrint(hotSpringsHappy.value);DBGPrintF(", read "); DBGPrint(readHappy.value); DBGPrintln();
   DBGPrintF("New happyPercent "); DBGPrint(getHappyPercent()); DBGPrintF(", from old happy percent "); DBGPrint(oldHappyPercent); 
   DBGPrintF(", lastHappyDelta is "); DBGPrint(lastHappyDelta); DBGPrintln();
 
@@ -544,7 +554,8 @@ TimeOfDay Watchytchi::getTimeOfDay(const tmElements_t &tm)
 float Watchytchi::getHappyPercent(bool shouldConstrain)
 {
   auto rawSum = foodHappy.value + strokeHappy.value + walkHappy.value 
-    + poopHappy.value + sleepHappy.value + playmateHappy.value + hotSpringsHappy.value;
+    + poopHappy.value + sleepHappy.value + playmateHappy.value + hotSpringsHappy.value
+    + readHappy.value;
   if (shouldConstrain)
     return constrain(rawSum, 0, 1);
   else
@@ -1119,6 +1130,7 @@ void Watchytchi::statusCheck_draw()
   tryDrawMoodle(moodleIdx, img_MoodleIcon_SleepHappy, img_MoodleIcon_SleepSad, sleepHappy.value);
   tryDrawMoodle(moodleIdx, img_MoodleIcon_PlaymateHappy, img_MoodleIcon_PlaymateHappy, playmateHappy.value);
   tryDrawMoodle(moodleIdx, img_MoodleIcon_HotSpringsHappy, img_MoodleIcon_HotSpringsHappy, hotSpringsHappy.value);
+  tryDrawMoodle(moodleIdx, img_MoodleIcon_ReadHappy, img_MoodleIcon_ReadHappy, readHappy.value);
 
   auto happyTier = getHappyTier();
   if (happyTier == HappyTier::Blissful)
@@ -1539,6 +1551,7 @@ bool Watchytchi::reading_handleButtonPress(uint64_t wakeupBit)
   {
     submenuIdx = max(submenuIdx - 1, 0);
     idleAnimIdx++;
+    readHappy.AddTo(0.05f);
     showWatchFace(true);
     return true;
   }
@@ -1547,6 +1560,7 @@ bool Watchytchi::reading_handleButtonPress(uint64_t wakeupBit)
   {
     submenuIdx = min(submenuIdx + 1, k_readingLength - 1);
     idleAnimIdx++;
+    readHappy.AddTo(0.05f);
     showWatchFace(true);
     return true;
   }
