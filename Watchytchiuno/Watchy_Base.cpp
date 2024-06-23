@@ -63,6 +63,9 @@ RTC_DATA_ATTR int lastPlaymateJoinTs = -1;
 RTC_DATA_ATTR int befriendedPlaymatesMask = 0;
 RTC_DATA_ATTR PlaymateSpecies bestFriendPlaymate = PlaymateSpecies::NoPlaymate;
 
+/*## State: Game State (Reading) ##*/
+RTC_DATA_ATTR int readingAssetIdx = 0;
+
 uint8_t scheduledVibrationTimes;
 uint32_t scheduledVibrationDelay;
 

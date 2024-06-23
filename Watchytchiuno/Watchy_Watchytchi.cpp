@@ -1373,6 +1373,7 @@ bool Watchytchi::activitySelect_handleButtonPress(uint64_t wakeupBit)
     else if (submenuIdx == AIDX_READING)
     {
       submenuIdx = 0;
+      readingAssetIdx = rand() % k_numReadingAssets;
       gameState = GameState::Reading;
     }
     showWatchFace(true);
@@ -1526,18 +1527,21 @@ bool Watchytchi::hotSpringsTimer_handleButtonPress(uint64_t wakeupBit)
 
 void Watchytchi::reading_draw()
 {
+  auto readingAsset = allReadingAssets[readingAssetIdx];
+  auto readingAssetLength = allReadingAssetLengths[readingAssetIdx];
+
   drawBgEnvironment();
   display.setFont(&Tintin_Dialogue10pt7b);
   display.setTextColor(GxEPD_BLACK);
   display.setCursor(14, 20);
   display.setTextWrap(true);
-  display.println(txt_velveteenIntro[submenuIdx]);
+  display.println(readingAsset[submenuIdx]);
 
   display.drawBitmap(0, 160, img_ReadingFirstPersonBookEdge, 200, 40, GxEPD_BLACK);
 
   if (submenuIdx > 0)
     display.drawBitmap(-2, 0, img_StrokingButtonPrompt_L, 6, 46, GxEPD_BLACK);
-  if (submenuIdx < k_readingLength - 1)
+  if (submenuIdx < readingAssetLength - 1)
     display.drawBitmap(196, 0, img_StrokingButtonPrompt_R, 6, 46, GxEPD_BLACK);
 
   critter->DrawReadingPose(idleAnimIdx, false);
@@ -1547,6 +1551,8 @@ void Watchytchi::reading_draw()
 
 bool Watchytchi::reading_handleButtonPress(uint64_t wakeupBit)
 {
+  auto readingAssetLength = allReadingAssetLengths[readingAssetIdx];
+
   if (IS_KEY_CURSOR)
   {
     submenuIdx = max(submenuIdx - 1, 0);
@@ -1558,7 +1564,7 @@ bool Watchytchi::reading_handleButtonPress(uint64_t wakeupBit)
 
   if (IS_KEY_SELECT)
   {
-    submenuIdx = min(submenuIdx + 1, k_readingLength - 1);
+    submenuIdx = min(submenuIdx + 1, readingAssetLength - 1);
     idleAnimIdx++;
     readHappy.AddTo(0.05f);
     showWatchFace(true);

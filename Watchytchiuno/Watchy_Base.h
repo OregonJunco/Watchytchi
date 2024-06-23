@@ -121,6 +121,9 @@ const String nvsKey_befriendedPlaymatesMask = "befriendedPMsMask";
 extern RTC_DATA_ATTR PlaymateSpecies bestFriendPlaymate;
 const String nvsKey_bestFriendPlaymate = "bestFriendPlaymate";
 
+/*## State: Game State (Reading) ##*/
+extern RTC_DATA_ATTR int readingAssetIdx;
+
 // Compile out macros to increase speed of serial printing
 #define DBGPrint(content) if (VERBOSE_LOGGING_ENABLED) {Serial.print(content);}
 #define DBGPrintF(content) if (VERBOSE_LOGGING_ENABLED) {Serial.print(F(content));}
