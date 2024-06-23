@@ -1058,7 +1058,7 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
       didPerformAction = true;
       if (numResetPresses >= 4)
         resetSaveData();
-      else
+      else if (numResetPresses == 1)
         tryWriteSaveData(true); // HACK: Force a save otherwise (temporary manual save for use before flashing)
     }
     // Vibrate if this selection resulted in an action
