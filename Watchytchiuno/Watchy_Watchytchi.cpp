@@ -10,7 +10,6 @@
 #include "fonts/Tintin_Dialogue10pt7b.h"
 #include "fonts/Tintin_Dialogue16pt7b.h"
 
-const unsigned char *dk_nums [10] = {dk0, dk1, dk2, dk3, dk4, dk5, dk6, dk7, dk8, dk9};
 const unsigned char *foodBerry_stages[7] = {img_FoodBerry_Stage0, img_FoodBerry_Stage1, img_FoodBerry_Stage2, img_FoodBerry_Stage3, 
   img_FoodBerry_Stage4, img_FoodBerry_Stage5, img_FoodBerry_Stage6};
   const unsigned char *foodCucumber_stages[7] = {img_FoodCucumberPlate_Stage0, img_FoodCucumberPlate_Stage1, img_FoodCucumberPlate_Stage2, 
