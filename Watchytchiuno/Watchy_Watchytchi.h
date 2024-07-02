@@ -1,6 +1,7 @@
 #pragma once
 #include "Watchy_Base.h"
 #include "ImageAssets.h"
+class MoodIconConfig;
 
 enum TimeOfDay {Daytime, Dusk, LateNight};
 enum HappyTier {Sad, Neutral, Happy, Blissful};
@@ -53,7 +54,7 @@ class Watchytchi : public WatchyBase{
         void drawAllUIButtons();
         void drawBgEnvironment();
         void drawWeather();
-        bool tryDrawMoodle(int& idx, const unsigned char* happyIcon, const unsigned char* sadIcon, float happyLevel);
+        bool tryDrawMoodle(int& idx, const MoodIconConfig* iconConfig, float happyLevel);
         void drawIdleCreature(bool isAnimating);
         void drawEatAnim();
         void drawPlaymate(int idleIdx, int xOffset = 0, int yOffset = 0);

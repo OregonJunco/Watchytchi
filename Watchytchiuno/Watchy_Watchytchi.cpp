@@ -4,6 +4,7 @@
 #include "SpeciesCode.h"
 #include <cmath>
 #include "ReadingMaterial.h"
+#include "MoodIconConfig.h"
 
 #include "fonts/Tintin_Dialogue8pt7b.h"
 #include "fonts/Tintin_Dialogue9pt7b.h"
@@ -798,7 +799,7 @@ void Watchytchi::drawWeather(){
   display.drawBitmap(cloud3X, 30, isDark ? img_DarkCloud3 : img_Cloud3, 130, 35, color_fg);
 }
 
-bool Watchytchi::tryDrawMoodle(int &idx, const unsigned char *happyIcon, const unsigned char *sadIcon, float happyLevel)
+bool Watchytchi::tryDrawMoodle(int &idx, const MoodIconConfig* icons, float happyLevel)
 {
   if (abs(happyLevel) < 0.1)
     return false;
@@ -824,8 +825,17 @@ bool Watchytchi::tryDrawMoodle(int &idx, const unsigned char *happyIcon, const u
   else if (happyLevel >= 0.1f)
     display.drawBitmap(xPos, yPos, img_MoodleBorder_SmallHeart, 32, 32, color_fg);
     
+
+  // TODO: don't hardcode for deerslug, create new function for life stage
+  if (species == CreatureSpecies::Deer)
+  {
+    display.drawBitmap(xPos, yPos, happyLevel > 0 ? icons->img_BabyHappy : icons->img_BabySad, 32, 32, color_fg);
+  }
+  else
+  {
+    display.drawBitmap(xPos, yPos, happyLevel > 0 ? icons->img_AdultHappy : icons->img_AdultSad, 32, 32, color_fg);
+  }
   // Draw mood icon
-  display.drawBitmap(xPos, yPos, happyLevel > 0 ? happyIcon : sadIcon, 32, 32, color_fg);
 
   idx++;
   return true;
@@ -1122,14 +1132,14 @@ void Watchytchi::statusCheck_draw()
   drawPlaymate(idleAnimIdx);
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
   int moodleIdx = 0;
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_FoodHappy_Adult, img_MoodleIcon_FoodSad_Adult, foodHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_StrokeHappy_Adult, img_MoodleIcon_StrokeHappy_Adult, strokeHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_WalkHappy_Adult, img_MoodleIcon_WalkHappy_Adult, walkHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_PoopHappy_Adult, img_MoodleIcon_PoopSad_Adult, poopHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_SleepHappy_Adult, img_MoodleIcon_SleepSad_Adult, sleepHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_PlaymateHappy_Adult, img_MoodleIcon_PlaymateHappy_Adult, playmateHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_HotSpringsHappy_Adult, img_MoodleIcon_HotSpringsHappy_Adult, hotSpringsHappy.value);
-  tryDrawMoodle(moodleIdx, img_MoodleIcon_ReadHappy_Adult, img_MoodleIcon_ReadHappy_Adult, readHappy.value);
+  tryDrawMoodle(moodleIdx, &MoodIconConfig::food, foodHappy.value);
+  tryDrawMoodle(moodleIdx, &MoodIconConfig::stroke, strokeHappy.value);
+  tryDrawMoodle(moodleIdx, &MoodIconConfig::walk, walkHappy.value);
+  tryDrawMoodle(moodleIdx, &MoodIconConfig::poop, poopHappy.value);
+  tryDrawMoodle(moodleIdx, &MoodIconConfig::sleep, sleepHappy.value);
+  tryDrawMoodle(moodleIdx, &MoodIconConfig::playmate, playmateHappy.value);
+  tryDrawMoodle(moodleIdx, &MoodIconConfig::hotSprings, hotSpringsHappy.value);
+  tryDrawMoodle(moodleIdx, &MoodIconConfig::read, readHappy.value);
 
   auto happyTier = getHappyTier();
   if (happyTier == HappyTier::Blissful)
