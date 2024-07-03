@@ -303,6 +303,14 @@ void Watchytchi::tickCreatureState()
   DBGPrintF("Current epoch time "); DBGPrint(currentEpochTime); DBGPrintF(", prev epoch time "); DBGPrint(lastUpdateTsEpoch); DBGPrintF(", delta of "); DBGPrint(timeDelta); DBGPrintln();
   lastUpdateTsEpoch = currentEpochTime;
 
+  // Detect first time user and play the intro
+  if (numSecondsAlive <= 0)
+  {
+    gameState = GameState::Intro;
+    numSecondsAlive += timeDelta;
+    return;  
+  }
+
   // Calculate number of days alive
   numSecondsAlive += timeDelta;
 

@@ -364,3 +364,21 @@ void Watchytchi::ending_draw()
     tryLoadSaveData(true);
   }
 }
+
+bool Watchytchi::intro_handleButtonPress(uint64_t wakeupBit)
+{
+  if (IS_KEY_CURSOR || IS_KEY_SELECT || IS_KEY_CANCEL) 
+  {
+    gameState = GameState::BaseMenu;
+    showWatchFace(true);
+    return true;
+  }
+  return false;
+}
+
+void Watchytchi::intro_draw()
+{
+  display.fillScreen(GxEPD_WHITE);
+  display.drawBitmap(0, 0, img_TitleCard, 200, 200, GxEPD_BLACK);
+  delay(2000);
+}

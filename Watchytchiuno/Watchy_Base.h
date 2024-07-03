@@ -13,7 +13,7 @@
 enum CreatureSpecies {Hog, Snake, Deer, COUNT};
 enum ScheduledAlertType {None, CloseUp, AskAboutDay};
 enum GameState {BaseMenu, StatusCheck, Eating, AlertInteraction, StrokingMode, HowWasYourDay, Ending, SharedWalk,
-    ActivitySelection, HotSpringsTimer, Reading, CNT};
+    ActivitySelection, HotSpringsTimer, Reading, Intro, CNT};
 enum PlaymateSpecies {NoPlaymate = -1, JuncoSnake = 0, SnappyLog = 1, BugRat = 2, SmokerBird = 3, NUMPLAYMATES};
 /*
 enum PlaymateSpecies {None = -1, JuncoSnake, LogGator, BeerPenguin, GooseHydra, PetRock, KingSnake, EyeFrog, RockHider,
@@ -98,7 +98,7 @@ extern RTC_DATA_ATTR ScheduledAlertType nextAlertType;
 const String nvsKey_nextAlertType = "nextAlertType";
 extern RTC_DATA_ATTR int submenuIdx;
 
-/*## State: Game State (Ending) ##*/
+/*## State: Game State (Lifecycle) ##*/
 extern RTC_DATA_ATTR bool hasExecutedEnding;
 
 /*## State: Game State (Shared Walk) ##*/
