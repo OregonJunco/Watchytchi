@@ -44,6 +44,7 @@ RTC_DATA_ATTR bool isStrokingLeftSide = false;
 RTC_DATA_ATTR int nextAlertTs = -1;
 RTC_DATA_ATTR ScheduledAlertType nextAlertType = ScheduledAlertType::None;
 RTC_DATA_ATTR int submenuIdx = 0;
+RTC_DATA_ATTR bool hasExecutedIntro = false;
 RTC_DATA_ATTR bool hasExecutedEnding = false;
 
 /*## State: Shared Walk ##*/

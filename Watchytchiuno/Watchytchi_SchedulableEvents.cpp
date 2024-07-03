@@ -369,7 +369,7 @@ bool Watchytchi::intro_handleButtonPress(uint64_t wakeupBit)
 {
   if (IS_KEY_CURSOR || IS_KEY_SELECT || IS_KEY_CANCEL) 
   {
-    gameState = GameState::BaseMenu;
+    hasExecutedIntro = true;
     showWatchFace(true);
     return true;
   }
@@ -378,7 +378,48 @@ bool Watchytchi::intro_handleButtonPress(uint64_t wakeupBit)
 
 void Watchytchi::intro_draw()
 {
-  display.fillScreen(GxEPD_WHITE);
-  display.drawBitmap(0, 0, img_TitleCard, 200, 200, GxEPD_BLACK);
-  delay(2000);
+  if (!hasExecutedIntro)
+  {
+    display.fillScreen(GxEPD_WHITE);
+    display.drawBitmap(0, 0, img_TitleWaitingCard, 200, 200, GxEPD_BLACK);
+  }
+  else
+  {
+    // Simple fade in on the title card
+    display.fillScreen(GxEPD_BLACK);
+    display.display(true);
+    delay(1000);
+
+    display.fillScreen(GxEPD_WHITE);
+    display.drawBitmap(0, 0, img_GoodEnd_FadeOut3, 200, 200, GxEPD_BLACK);
+    display.drawBitmap(0, 0, img_TitleCard, 200, 200, GxEPD_BLACK);
+    display.display(true);
+    delay(1000);
+
+    display.fillScreen(GxEPD_WHITE);
+    display.drawBitmap(0, 0, img_GoodEnd_FadeOut2, 200, 200, GxEPD_BLACK);
+    display.drawBitmap(0, 0, img_TitleCard, 200, 200, GxEPD_BLACK);
+    display.display(true);
+    delay(1000);
+    
+    display.fillScreen(GxEPD_WHITE);
+    display.drawBitmap(0, 0, img_GoodEnd_FadeOut1, 200, 200, GxEPD_BLACK);
+    display.drawBitmap(0, 0, img_TitleCard, 200, 200, GxEPD_BLACK);
+    display.display(true);
+    delay(1000);
+
+
+
+    display.fillScreen(GxEPD_WHITE);
+    display.drawBitmap(0, 0, img_TitleCard, 200, 200, GxEPD_BLACK);
+    display.display(true);
+    delay(100);
+
+    display.fillScreen(GxEPD_WHITE);
+    display.drawBitmap(0, 0, img_TitleCard, 200, 200, GxEPD_BLACK);
+    display.display(true);
+    delay(2000);
+
+    gameState = GameState::BaseMenu;
+  }
 }

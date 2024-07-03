@@ -99,6 +99,7 @@ const String nvsKey_nextAlertType = "nextAlertType";
 extern RTC_DATA_ATTR int submenuIdx;
 
 /*## State: Game State (Lifecycle) ##*/
+extern RTC_DATA_ATTR bool hasExecutedIntro;
 extern RTC_DATA_ATTR bool hasExecutedEnding;
 
 /*## State: Game State (Shared Walk) ##*/
