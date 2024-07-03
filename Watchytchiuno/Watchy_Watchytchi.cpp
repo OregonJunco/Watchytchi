@@ -550,7 +550,7 @@ TimeOfDay Watchytchi::getTimeOfDay()
 
 TimeOfDay Watchytchi::getTimeOfDay(const tmElements_t &tm)
 {
-  if (tm.Hour >= 21 || tm.Hour <= 6)
+  if (tm.Hour >= 21 || tm.Hour <= 7)
     return TimeOfDay::LateNight;
   else if (tm.Hour > 18 || (tm.Hour == 18 && tm.Minute >= 30))
     return TimeOfDay::Dusk;
