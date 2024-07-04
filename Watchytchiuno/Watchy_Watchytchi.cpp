@@ -1056,7 +1056,7 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
       auto contextAction = getActiveContextAction();
       if (contextAction == ContextAction::LightsOff)
       {
-        invertColors = false;
+        invertColors = true;
         didPerformAction = true;
       }
       else if (contextAction == ContextAction::Clean)
