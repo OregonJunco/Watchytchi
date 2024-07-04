@@ -717,6 +717,8 @@ void Watchytchi::drawUIButton(int idx, bool quickCursorUpdate)
       display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Status_Active : img_MenuIcon_Status_Inactive, 32, 32, iconColor);
     else if (idx == MENUIDX_FEED)
       display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Feed_Active : img_MenuIcon_Feed_Inactive, 32, 32, iconColor);
+    else if (idx == MENUIDX_STROKE)
+      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Stroke_Active : img_MenuIcon_Stroke_Inactive, 32, 32, iconColor);
     else if (idx == MENUIDX_CONTEXT)
     {
       // The context icon can be a number of things!
@@ -731,8 +733,6 @@ void Watchytchi::drawUIButton(int idx, bool quickCursorUpdate)
       else
           display.drawBitmap(xPos, yPos, img_MenuIcon_Alert_Inactive, 32, 32, iconColor);
     }
-    else if (idx == MENUIDX_STROKE)
-      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Stroke_Active : img_MenuIcon_Stroke_Inactive, 32, 32, iconColor);
     else if (idx == MENUIDX_WALK)
       display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Walk_Active : img_MenuIcon_Walk_Inactive, 32, 32, iconColor);
     else if (idx == MENUIDX_HOTSPRINGS)
@@ -1051,6 +1051,12 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
       gameState = GameState::Eating;
       didPerformAction = true;
     }
+    // Start stroking
+    if (menuIdx == MENUIDX_STROKE)
+    {
+      gameState = GameState::StrokingMode;
+      DBGPrintF("Entering stroke mode!"); DBGPrintln();
+    }      
     if (menuIdx == MENUIDX_CONTEXT)
     {
       auto contextAction = getActiveContextAction();
@@ -1075,12 +1081,6 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
         didPerformAction = false;
       }
     }
-    // Start stroking
-    if (menuIdx == MENUIDX_STROKE)
-    {
-      gameState = GameState::StrokingMode;
-      DBGPrintF("Entering stroke mode!"); DBGPrintln();
-    }      
     if (menuIdx == MENUIDX_WALK)
     {
       // TODO: move to state entry function
