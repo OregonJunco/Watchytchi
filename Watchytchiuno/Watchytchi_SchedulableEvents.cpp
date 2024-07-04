@@ -15,7 +15,6 @@ const unsigned char* img_angryLetterFrames[8] = {
 	img_BadEnd_AngryLetter8
 };
 
-
 bool Watchytchi::hasActiveAlert()
 {
   time_t currentEpochTime = makeTime(currentTime);

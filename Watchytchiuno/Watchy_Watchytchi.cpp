@@ -373,10 +373,6 @@ void Watchytchi::tickCreatureState()
   if (gameState == GameState::Ending)
     return;
 
-  // Clear the number of reset button presses if the player navigates away in the menu
-  if (menuIdx != MENUIDX_RESET)
-    numResetPresses = 0;
-
   // Stat atrophy is slower in the morning to limit cases where you wake up and your creature is miserable
   auto atrophySpeedModifier = currentTime.Hour > 10 ? 1.f : 0.5f;
 
@@ -587,6 +583,22 @@ HappyTier Watchytchi::getHappyTier(float hPercent)
   return HappyTier::Sad;
 }
 
+
+ContextAction Watchytchi::getActiveContextAction()
+{
+  // If it's late night, show the light switch
+  if (!invertColors && getTimeOfDay() == TimeOfDay::LateNight)
+    return ContextAction::LightsOff;
+  // If it's daytime and I have poop, show clean icon
+  else if (!invertColors && hasPoop)
+    return ContextAction::Clean;
+  // Otherwise, show the event selection
+  else if (hasActiveAlert())
+    return ContextAction::TriggerAlert;
+  else
+    return ContextAction::NoContextActionAvailable;
+}
+
 bool Watchytchi::isUnhappinessIncreasing()
 {
   return hunger <= 0.45f || hasPoop; 
@@ -702,37 +714,33 @@ void Watchytchi::drawUIButton(int idx, bool quickCursorUpdate)
 
     auto selected = idx == menuIdx;
     if (idx == MENUIDX_INSPECT)
-      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Status_Active : img_MenuIcon_Status_Inactive, 32, 32, iconColor);
+      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Status_Active : img_MenuIcon_Status_Inactive, 32, 32, iconColor);
     else if (idx == MENUIDX_FEED)
-      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Feed_Active : img_MenuIcon_Feed_Inactive, 32, 32, iconColor);
-    else if (idx == MENUIDX_STROKE)
-      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Stroke_Active : img_MenuIcon_Stroke_Inactive, 32, 32, iconColor);
-    else if (idx == MENUIDX_ALERT)
+      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Feed_Active : img_MenuIcon_Feed_Inactive, 32, 32, iconColor);
+    else if (idx == MENUIDX_CONTEXT)
     {
-      // The alert menu icon draws differently depending on whether there is an active alert
-      auto hasAlert = hasActiveAlert();
-      if (hasAlert && selected)
-        display.drawBitmap(xPos, yPos, img_MenuIcon_Alert_Active_HasNotification, 32, 32, iconColor);
-      else if (hasAlert)
-        display.drawBitmap(xPos, yPos, img_MenuIcon_Alert_Inactive_HasNotification, 32, 32, iconColor);
-      else 
-        display.drawBitmap(xPos, yPos, img_MenuIcon_Alert_Inactive, 32, 32, iconColor);
-    }
-    else if (idx == MENUIDX_ACTIVITY)
-      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Activity_Active : img_MenuIcon_Activity_Inactive, 32, 32, iconColor);
-    else if (idx == MENUIDX_CLEAN)
-      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Clean_Active : img_MenuIcon_Clean_Inactive, 32, 32, iconColor);
-    else if (idx == MENUIDX_LIGHT)
-      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Lights_Active : img_MenuIcon_Lights_Inactive, 32, 32, iconColor);
-    else if (idx == MENUIDX_RESET)
-    {
-      if (idx != menuIdx)
-        display.drawBitmap(xPos, yPos, img_MenuIcon_ResetSave_Inactive, 32, 32, iconColor);
+      // The context icon can be a number of things!
+      auto contextAction = getActiveContextAction();
+
+      if (contextAction == ContextAction::LightsOff)
+        display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Lights_Active : img_MenuIcon_Lights_Inactive, 32, 32, iconColor);
+      else if (contextAction == ContextAction::Clean)
+        display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Clean_Active : img_MenuIcon_Clean_Inactive, 32, 32, iconColor);
+      else if (contextAction == ContextAction::TriggerAlert)
+          display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Alert_Active_HasNotification : img_MenuIcon_Alert_Inactive_HasNotification, 32, 32, iconColor);
       else
-        display.drawBitmap(xPos, yPos, menu_reset_press_stages[constrain(numResetPresses, 0, 4)], 32, 32, iconColor);
+          display.drawBitmap(xPos, yPos, img_MenuIcon_Alert_Inactive, 32, 32, iconColor);
     }
-    else
-      display.drawBitmap(xPos, yPos, idx == menuIdx ? img_MenuIcon_Placeholder_Active : img_MenuIcon_Placeholder_Inactive, 32, 32, iconColor);
+    else if (idx == MENUIDX_STROKE)
+      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Stroke_Active : img_MenuIcon_Stroke_Inactive, 32, 32, iconColor);
+    else if (idx == MENUIDX_WALK)
+      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Walk_Active : img_MenuIcon_Walk_Inactive, 32, 32, iconColor);
+    else if (idx == MENUIDX_HOTSPRINGS)
+      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_HotSprings_Active : img_MenuIcon_HotSprings_Inactive, 32, 32, iconColor);
+    else if (idx == MENUIDX_READ)
+      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Read_Active : img_MenuIcon_Read_Inactive, 32, 32, iconColor);
+    else if (idx == MENUIDX_SETTINGS)
+      display.drawBitmap(xPos, yPos, selected ? img_MenuIcon_Settings_Active : img_MenuIcon_Settings_Inactive, 32, 32, iconColor);
 
     // Selected drop shadow
     if (idx == menuIdx)
@@ -1037,57 +1045,69 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
       gameState = GameState::StatusCheck;
       didPerformAction = true;
     }
-    // Start stroking
-    if (menuIdx == MENUIDX_STROKE)
-    {
-      gameState = GameState::StrokingMode;
-      DBGPrintF("Entering stroke mode!"); DBGPrintln();
-    }      
     // Start feeding
     if (menuIdx == MENUIDX_FEED)
     {
       gameState = GameState::Eating;
       didPerformAction = true;
     }
-    // React to alert
-    if (menuIdx == MENUIDX_ALERT && hasActiveAlert())
+    if (menuIdx == MENUIDX_CONTEXT)
     {
-      gameState = GameState::AlertInteraction;
-      didPerformAction = false;
+      auto contextAction = getActiveContextAction();
+      if (contextAction == ContextAction::LightsOff)
+      {
+        invertColors = false;
+        didPerformAction = true;
+      }
+      else if (contextAction == ContextAction::Clean)
+      {
+        hasPoop = false;
+        poopHappy.value = poopHappy.max;
+        auto prevHour = lastPoopHour;
+        lastPoopHour = currentTime.Hour; // Cleaning resets last poop hour in order to prevent immediate poop once again
+        lastAnimateMinute = -99; // Do a little dance afterwards by resetting the last animate minute
+        DBGPrintF("Cleaned poop! New lastPoopHour ="); DBGPrint(lastPoopHour); DBGPrintF(", previously it was"); DBGPrint(prevHour); DBGPrintln();
+        didPerformAction = true;
+      }
+      else if (contextAction == ContextAction::TriggerAlert)
+      {
+        gameState = GameState::AlertInteraction;
+        didPerformAction = false;
+      }
     }
-    // Clean Poop
-    if (hasPoop && menuIdx == MENUIDX_CLEAN)
+    // Start stroking
+    if (menuIdx == MENUIDX_STROKE)
     {
-      hasPoop = false;
-      poopHappy.value = poopHappy.max;
+      gameState = GameState::StrokingMode;
+      DBGPrintF("Entering stroke mode!"); DBGPrintln();
+    }      
+    if (menuIdx == MENUIDX_WALK)
+    {
+      // TODO: move to state entry function
+      bmaStepsAtWalkStart = sensor.getCounter();
+      lastStepsDuringWalkCount = 0;
+      gameState = GameState::SharedWalk;
       didPerformAction = true;
-      auto prevHour = lastPoopHour;
-      lastPoopHour = currentTime.Hour; // Cleaning resets last poop hour in order to prevent immediate poop once again
-      lastAnimateMinute = -99; // Do a little dance afterwards by resetting the last animate minute
-      DBGPrintF("Cleaned poop! New lastPoopHour ="); DBGPrint(lastPoopHour); DBGPrintF(", previously it was"); DBGPrint(prevHour); DBGPrintln();
     }
-    // Toggle Light
-    if (menuIdx == MENUIDX_LIGHT && (currentTime.Hour >= 21 || currentTime.Hour <= 6))
+    if (menuIdx == MENUIDX_HOTSPRINGS)
     {
-      invertColors = !invertColors;
-      didPerformAction = true;
+      hotSpringsTimerSecsLeft = 25 * 60;
+      isHotSpringsTimerPlaying = true;
+      isHotSpringsTimerOnBreak = false;
+      gameState = GameState::HotSpringsTimer;
     }
-    // Enter activity submenu
-    if (menuIdx == MENUIDX_ACTIVITY)
+    if (menuIdx == MENUIDX_READ)
+    {
+      submenuIdx = 0;
+      readingAssetIdx = rand() % k_numReadingAssets;
+      gameState = GameState::Reading;
+    }
+    // Enter Settings submenu
+    if (menuIdx == MENUIDX_SETTINGS)
     { 
       submenuIdx = 0;
-      gameState = GameState::ActivitySelection;
+      gameState = GameState::Settings;
       didPerformAction = true;
-    }
-    // HACK: until we have a settings menu, resetting save data is an option from one of the 8 care buttons
-    if (menuIdx == MENUIDX_RESET)
-    {
-      numResetPresses++;
-      didPerformAction = true;
-      if (numResetPresses >= 4)
-        resetSaveData();
-      else if (numResetPresses == 1)
-        tryWriteSaveData(true); // HACK: Force a save otherwise (temporary manual save for use before flashing)
     }
     // Vibrate if this selection resulted in an action
     if (didPerformAction)
@@ -1098,13 +1118,27 @@ bool Watchytchi::baseMenu_handleButtonPress(uint64_t wakeupBit)
  
   if (IS_KEY_CURSOR) {
     menuIdx = (menuIdx + 1) % 8;
-    // Skip the alert icon if there is no active alert. Disallow certain care actions while it's night
-    while ((!hasActiveAlert() && menuIdx == MENUIDX_ALERT)
-      || (getTimeOfDay() == TimeOfDay::LateNight && (menuIdx == MENUIDX_FEED || menuIdx == MENUIDX_STROKE 
-        || menuIdx == MENUIDX_ACTIVITY || menuIdx == MENUIDX_CLEAN)))
+    // Skip invalid care icons
+    for (auto _ = 0; _ < 8; _++)
     {
-      menuIdx = (menuIdx + 1) % 8;
+      // At night, skip any care icons other than inspect, settings, or turning out the lights
+      if (getTimeOfDay() == TimeOfDay::LateNight)
+      {
+        if (menuIdx == MENUIDX_INSPECT || menuIdx == MENUIDX_SETTINGS || ( menuIdx == MENUIDX_CONTEXT && getActiveContextAction() == ContextAction::LightsOff))
+          break;
+        else
+          menuIdx = (menuIdx + 1) % 8;
+      }
+      // In the daytime, skip the context button if there is no contextual action
+      else
+      {
+        if (menuIdx == MENUIDX_CONTEXT && getActiveContextAction() == ContextAction::NoContextActionAvailable)
+          menuIdx = (menuIdx + 1) % 8;
+        else
+          break;
+      }     
     }
+
     vibrate();
     lastAdvanceIdxMinute = currentTime.Minute;
 
@@ -1342,18 +1376,22 @@ bool Watchytchi::sharedWalk_handleButtonPress(uint64_t wakeupBit)
   return false;
 }
 
-void Watchytchi::activitySelect_draw()
+void Watchytchi::settings_draw()
 {
+  const int SIDX_SAVE = 0, SIDX_RESET = 1, NUMSETTINGS = 2;
   drawBgEnvironment();
   drawWeather();
   drawDebugClock();
 
-  // Draw activity options
+  // Draw Settings options
   auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
-  display.drawBitmap(41, 83, submenuIdx == 0 ? img_MenuIcon_Walk_Active : img_MenuIcon_Walk_Inactive, 32, 32, color_fg);
-  display.drawBitmap(78, 83, submenuIdx == 1 ? img_MenuIcon_HotSprings_Active : img_MenuIcon_HotSprings_Inactive, 32, 32, color_fg);
-  display.drawBitmap(115, 83, submenuIdx == 2 ? img_MenuIcon_Read_Active : img_MenuIcon_Read_Inactive, 32, 32, color_fg);
+  display.drawBitmap(41, 83, submenuIdx == SIDX_SAVE ? img_MenuIcon_Save_Active : img_MenuIcon_Save_Inactive, 32, 32, color_fg);
+  // Different Reset icon depending on num presses
+  if (submenuIdx == SIDX_RESET)
+    display.drawBitmap(78, 83, menu_reset_press_stages[constrain(numResetPresses, 0, 4)], 32, 32, color_fg);
+  else
+    display.drawBitmap(78, 83, img_MenuIcon_ResetSave_Inactive, 32, 32, color_fg);
   auto cursorX = 50 + 38 * submenuIdx;
   display.drawBitmap(cursorX, 69, img_MoodSelectionCursor, 12, 12, color_fg);
   
@@ -1362,36 +1400,31 @@ void Watchytchi::activitySelect_draw()
   drawPoop();
 }
 
-bool Watchytchi::activitySelect_handleButtonPress(uint64_t wakeupBit)
+bool Watchytchi::settings_handleButtonPress(uint64_t wakeupBit)
 {
+  const int SIDX_SAVE = 0, SIDX_RESET = 1, NUMSETTINGS = 2;
   if (IS_KEY_CURSOR)
   {
-    submenuIdx = (submenuIdx + 1) % 3;
+    submenuIdx = (submenuIdx + 1) % NUMSETTINGS;
+    numResetPresses = 0;
+    scheduleVibration(1);
     showWatchFace(true);
     return true;
   }
 
-  const int AIDX_SHAREDWALK = 0, AIDX_HOTSPRINGSTIMER = 1, AIDX_READING = 2;
   if (IS_KEY_SELECT)
   {
-    if (submenuIdx == AIDX_SHAREDWALK)
+    if (submenuIdx == SIDX_SAVE)
     {
-      bmaStepsAtWalkStart = sensor.getCounter();
-      lastStepsDuringWalkCount = 0;
-      gameState = GameState::SharedWalk;
+      // Manual save for use before flashing
+      tryWriteSaveData(true); 
     }
-    else if (submenuIdx == AIDX_HOTSPRINGSTIMER)
+
+    else if (submenuIdx == SIDX_RESET)
     {
-      hotSpringsTimerSecsLeft = 25 * 60;
-      isHotSpringsTimerPlaying = true;
-      isHotSpringsTimerOnBreak = false;
-      gameState = GameState::HotSpringsTimer;
-    }
-    else if (submenuIdx == AIDX_READING)
-    {
-      submenuIdx = 0;
-      readingAssetIdx = rand() % k_numReadingAssets;
-      gameState = GameState::Reading;
+      numResetPresses++;
+      if (numResetPresses >= 4)
+        resetSaveData();
     }
     showWatchFace(true);
     return true;
@@ -1400,6 +1433,7 @@ bool Watchytchi::activitySelect_handleButtonPress(uint64_t wakeupBit)
   // Cancel exits the submenu
   if (IS_KEY_CANCEL)
   {
+    numResetPresses = 0;
     gameState = GameState::BaseMenu;
     showWatchFace(true);
     return true;

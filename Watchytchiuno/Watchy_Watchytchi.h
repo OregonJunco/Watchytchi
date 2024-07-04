@@ -5,6 +5,7 @@ class MoodIconConfig;
 
 enum TimeOfDay {Daytime, Dusk, LateNight};
 enum HappyTier {Sad, Neutral, Happy, Blissful};
+enum ContextAction {NoContextActionAvailable, LightsOff, Clean, TriggerAlert};
 
 class SpeciesBase; // Needed to prevent circular include
 
@@ -34,6 +35,7 @@ class Watchytchi : public WatchyBase{
         float getHappyPercent(bool shouldConstrain = true);
         HappyTier getHappyTier();
         HappyTier getHappyTier(float happyPercent);
+        ContextAction getActiveContextAction();
         bool isUnhappinessIncreasing();
         bool qualifiesForBadEnd();
         bool isElectricLit();
@@ -81,8 +83,8 @@ class Watchytchi : public WatchyBase{
         bool ending_handleButtonPress(uint64_t wakeupBit);
         void sharedWalk_draw();
         bool sharedWalk_handleButtonPress(uint64_t wakeupBit);
-        void activitySelect_draw();
-        bool activitySelect_handleButtonPress(uint64_t wakeupBit);
+        void settings_draw();
+        bool settings_handleButtonPress(uint64_t wakeupBit);
         void hotSpringsTimer_draw();
         bool hotSpringsTimer_handleButtonPress(uint64_t wakeupBit);
         void reading_draw();
@@ -101,7 +103,7 @@ class Watchytchi : public WatchyBase{
             &Watchytchi::howWasYourDay_draw, // HOW WAS YOUR DAY
             &Watchytchi::ending_draw, // ENDING
             &Watchytchi::sharedWalk_draw, // SHARED WALK
-            &Watchytchi::activitySelect_draw, // ACTIVITY SELECT
+            &Watchytchi::settings_draw, // SETTINGS
             &Watchytchi::hotSpringsTimer_draw, // HOT SPRINGS TIMER
             &Watchytchi::reading_draw, // READING
             &Watchytchi::intro_draw // INTRO
@@ -117,7 +119,7 @@ class Watchytchi : public WatchyBase{
             &Watchytchi::howWasYourDay_handleButtonPress, // HOW WAS YOUR DAY
             &Watchytchi::ending_handleButtonPress, // ENDING
             &Watchytchi::sharedWalk_handleButtonPress, // SHARED WALK
-            &Watchytchi::activitySelect_handleButtonPress, // ACTIVITY SELECT
+            &Watchytchi::settings_handleButtonPress, // SETTINGS
             &Watchytchi::hotSpringsTimer_handleButtonPress, // HOT SPRINGS TIMER
             &Watchytchi::reading_handleButtonPress, // READING
             &Watchytchi::intro_handleButtonPress // INTRO

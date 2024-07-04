@@ -13,7 +13,7 @@
 enum CreatureSpecies {Hog, Snake, Deer, COUNT};
 enum ScheduledAlertType {None, CloseUp, AskAboutDay};
 enum GameState {BaseMenu, StatusCheck, Eating, AlertInteraction, StrokingMode, HowWasYourDay, Ending, SharedWalk,
-    ActivitySelection, HotSpringsTimer, Reading, Intro, CNT};
+    Settings, HotSpringsTimer, Reading, Intro, CNT};
 enum PlaymateSpecies {NoPlaymate = -1, JuncoSnake = 0, SnappyLog = 1, BugRat = 2, SmokerBird = 3, NUMPLAYMATES};
 /*
 enum PlaymateSpecies {None = -1, JuncoSnake, LogGator, BeerPenguin, GooseHydra, PetRock, KingSnake, EyeFrog, RockHider,
@@ -143,13 +143,13 @@ extern RTC_DATA_ATTR int readingAssetIdx;
 
 const int MENUIDX_NOTHING = -1;
 const int MENUIDX_INSPECT = 0;
-const int MENUIDX_STROKE = 1;
-const int MENUIDX_FEED = 2;
-const int MENUIDX_ALERT = 3;
-const int MENUIDX_ACTIVITY = 4;
-const int MENUIDX_CLEAN = 5;
-const int MENUIDX_LIGHT = 6;
-const int MENUIDX_RESET = 7;
+const int MENUIDX_FEED = 1;
+const int MENUIDX_CONTEXT = 2;
+const int MENUIDX_STROKE = 3;
+const int MENUIDX_WALK = 4;
+const int MENUIDX_HOTSPRINGS = 5;
+const int MENUIDX_READ = 6;
+const int MENUIDX_SETTINGS = 7;
 
 class WatchyBase : public Watchy {
     using Watchy::Watchy;
