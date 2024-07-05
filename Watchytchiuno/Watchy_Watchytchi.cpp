@@ -1386,13 +1386,13 @@ void Watchytchi::settings_draw()
   // Draw Settings options
   auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
-  display.drawBitmap(41, 83, submenuIdx == SIDX_SAVE ? img_MenuIcon_Save_Active : img_MenuIcon_Save_Inactive, 32, 32, color_fg);
+  display.drawBitmap(61, 83, submenuIdx == SIDX_SAVE ? img_MenuIcon_Save_Active : img_MenuIcon_Save_Inactive, 32, 32, color_fg);
   // Different Reset icon depending on num presses
   if (submenuIdx == SIDX_RESET)
-    display.drawBitmap(78, 83, menu_reset_press_stages[constrain(numResetPresses, 0, 4)], 32, 32, color_fg);
+    display.drawBitmap(98, 83, menu_reset_press_stages[constrain(numResetPresses, 0, 4)], 32, 32, color_fg);
   else
-    display.drawBitmap(78, 83, img_MenuIcon_ResetSave_Inactive, 32, 32, color_fg);
-  auto cursorX = 50 + 38 * submenuIdx;
+    display.drawBitmap(98, 83, img_MenuIcon_ResetSave_Inactive, 32, 32, color_fg);
+  auto cursorX = 70 + 38 * submenuIdx;
   display.drawBitmap(cursorX, 69, img_MoodSelectionCursor, 12, 12, color_fg);
   
   drawIdleCreature(false);
