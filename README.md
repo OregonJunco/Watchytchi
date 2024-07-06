@@ -13,7 +13,7 @@ The code for the Watchy project can be found in the "Watchytchiuno" folder. The 
 
 ## Instructions:
 ### Navigation:
- - **The upper-left button is "Cursor,"** which moves your menu selection. **The upper right button is "Confirm,"** which you use to select options. **The lower right button is "Cancel,"** which backs out of menus and resets your cursor position. **The lower left button is "Settings,"** and opens up the various Watchy firmware options, such as time set, viration test, etc.
+ - **The upper-left button is "Cursor,"** which moves your menu selection. **The upper right button is "Confirm,"** which you use to select options. **The lower right button is "Cancel,"** which backs out of menus and resets your cursor position. **The lower left button is "Settings,"** and opens up the various Watchy firmware options, such as time set, vibration test, etc.
  - Pressing the "Cursor" button cycles your selection between the care icons on the top and bottom. A selected option is drawn in all black, while unselected options are grayed out (dithered)
  - The device vibrates when you advance your cursor or select an option
 ### <img src="./Watchytchi/data/MenuIcon_Status_Active.png" alt="Magnifying Glass Icon" width="16"/> Inspect
