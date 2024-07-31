@@ -36,6 +36,7 @@ RTC_DATA_ATTR int idleAnimIdx = 0;
 RTC_DATA_ATTR bool isPeriodicAnim = false;
 RTC_DATA_ATTR int lastHungerCryMinute = -1;
 RTC_DATA_ATTR int lastAnimateMinute = 0;
+RTC_DATA_ATTR int activeIdleSceneIdx = 0;
 
 /*## State: Game State (Stroking) ##*/
 RTC_DATA_ATTR bool isStrokingLeftSide = false;

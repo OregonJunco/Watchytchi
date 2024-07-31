@@ -87,6 +87,7 @@ extern RTC_DATA_ATTR int idleAnimIdx;
 extern RTC_DATA_ATTR bool isPeriodicAnim;
 extern RTC_DATA_ATTR int lastHungerCryMinute;
 extern RTC_DATA_ATTR int lastAnimateMinute;
+extern RTC_DATA_ATTR int activeIdleSceneIdx;
 
 /*## State: Game State (Stroking) ##*/
 extern RTC_DATA_ATTR bool isStrokingLeftSide;

@@ -5,6 +5,7 @@
 #include <cmath>
 #include "ReadingMaterial.h"
 #include "MoodIconConfig.h"
+#include "IdleScenes.h"
 
 #include "fonts/Tintin_Dialogue8pt7b.h"
 #include "fonts/Tintin_Dialogue9pt7b.h"
@@ -40,6 +41,11 @@ const unsigned char *img_smallFontArr[10] = {
   img_smallFont_7,
   img_smallFont_8,
   img_smallFont_9
+};
+
+IdleScene* idleScenes[1] =
+{
+  new IdleScene_Default() 
 };
 
 static float floatMap(float val, float fromLow, float fromHigh, float toLow, float toHigh, float precision = 1000.f)
@@ -677,6 +683,12 @@ void Watchytchi::clearCreatureBackground()
     display.fillRect(120, 94, 106, 72, color_bg);
 }
 
+void Watchytchi::clearNonUIBackground()
+{
+  auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
+  display.fillRect(0, 33, 200, 134, color_bg);
+}
+
 void Watchytchi::clearScreen()
 {
   auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
@@ -858,8 +870,6 @@ bool Watchytchi::tryDrawMoodle(int &idx, const MoodIconConfig* icons, float happ
 }
 
 void Watchytchi::drawIdleCreature(bool isAnimating){
-  auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
-  auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
   // Late night with lights on: Sleepy pose
   if (getTimeOfDay() == TimeOfDay::LateNight && !invertColors)
     critter->DrawSleepyPose(idleAnimIdx, isAnimating);
@@ -973,12 +983,12 @@ void Watchytchi::drawDebugClock()
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
   // Draw a very small debug clock:
   //Hour
-  display.drawBitmap(183-46, 195, img_smallFontArr[currentTime.Hour/10], 3, 5, color_fg); //first digit
-  display.drawBitmap(187-46, 195, img_smallFontArr[currentTime.Hour%10], 3, 5, color_fg); //second digit
+  display.drawBitmap(183-2, 195, img_smallFontArr[currentTime.Hour/10], 3, 5, color_fg); //first digit
+  display.drawBitmap(187-2, 195, img_smallFontArr[currentTime.Hour%10], 3, 5, color_fg); //second digit
 
   //Minute
-  display.drawBitmap(192-46, 195, img_smallFontArr[currentTime.Minute/10], 3, 5, color_fg); //first digit
-  display.drawBitmap(196-46, 195, img_smallFontArr[currentTime.Minute%10], 3, 5, color_fg); //second digit
+  display.drawBitmap(192-2, 195, img_smallFontArr[currentTime.Minute/10], 3, 5, color_fg); //first digit
+  display.drawBitmap(196-2, 195, img_smallFontArr[currentTime.Minute%10], 3, 5, color_fg); //second digit
 }
 
 void Watchytchi::drawPoop()
@@ -1000,11 +1010,11 @@ bool Watchytchi::dummy_handleButtonPress(uint64_t)
 
 void Watchytchi::baseMenu_draw()
 {
-  drawBgEnvironment();
-  drawWeather();
+  IdleScene* scene = idleScenes[activeIdleSceneIdx];
+  scene->critter = critter;
+  scene->owner = this;
+  scene->DrawBG(idleAnimIdx);
   drawAllUIButtons();
-  drawDebugClock();
-  drawPoop();
 
   // Animate an idle loop every 3 minutes
   if (currentTime.Hour >= 6 && (currentTime.Minute - lastAnimateMinute > 3 || lastAnimateMinute > currentTime.Minute))
@@ -1014,21 +1024,15 @@ void Watchytchi::baseMenu_draw()
     for (auto i = 0; i < numAnimFrames; i++)
     {
       isPeriodicAnim &= (i != numAnimFrames - 1);
-      drawIdleCreature(i != numAnimFrames - 1);
-      if (hasActivePlaymate())
-        drawPlaymate(idleAnimIdx);
+      scene->DrawFG(idleAnimIdx);
       display.display(true);
       if (i != numAnimFrames - 1)
-        clearCreatureBackground();
+        clearNonUIBackground();
     }
     lastAnimateMinute = currentTime.Minute;
   }
   else {
-    drawIdleCreature(false);
-    if (hasActivePlaymate())
-      drawPlaymate(idleAnimIdx);
-    else
-      drawAgeFlower();
+    scene->DrawFG(idleAnimIdx);
   }    
 }
 

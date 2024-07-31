@@ -51,6 +51,7 @@ class Watchytchi : public WatchyBase{
 
         /*# Draw functions #*/
         void clearCreatureBackground();
+        void clearNonUIBackground();
         void clearScreen();
         void drawUIButton(int idx, bool quickCursorUpdate);
         void drawAllUIButtons();
