@@ -43,10 +43,13 @@ const unsigned char *img_smallFontArr[10] = {
   img_smallFont_9
 };
 
-const int k_numIdleScenes = 1;
+const int k_numIdleScenes = 4;
 IdleScene* idleScenes[k_numIdleScenes] =
 {
-  new IdleScene_Default() 
+  new IdleScene_Default(),
+  new IdleScene_FloorActivity(new std::vector<const unsigned char*> {img_FloorActivityProp_Blocks1, img_FloorActivityProp_Blocks2, img_FloorActivityProp_Blocks3, img_FloorActivityProp_Blocks4}),
+  new IdleScene_FloorActivity(new std::vector<const unsigned char*> {img_FloorActivityProp_Drawing1, img_FloorActivityProp_Drawing2, img_FloorActivityProp_Drawing3, img_FloorActivityProp_Drawing4}),
+  new IdleScene_FloorActivity(new std::vector<const unsigned char*> {img_FloorActivityProp_AntHill}),
 };
 
 static float floatMap(float val, float fromLow, float fromHigh, float toLow, float toHigh, float precision = 1000.f)
@@ -674,6 +677,8 @@ bool Watchytchi::hasActivePlaymate()
 
 int Watchytchi::getPlaymateXOffset()
 {
+  if (idleScenes[activeIdleSceneIdx]->OffsetCreatureToLeft())
+    return -65;
   if (hasActivePlaymate())
     return -50;
   return 0;
@@ -950,6 +955,8 @@ void Watchytchi::drawPlaymate(int idleIdx, int xOffset, int yOffset)
 
   auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
+  if (gameState == GameState::BaseMenu && idleScenes[activeIdleSceneIdx]->OffsetCreatureToLeft())
+    xOffset += 10;
 
   DBGPrintF("Active playmate is "); DBGPrint(activePlaymate); DBGPrintln();
 
@@ -1007,7 +1014,9 @@ void Watchytchi::drawPoop()
   auto color_bg = invertColors ? GxEPD_BLACK : GxEPD_WHITE;
   auto color_fg = invertColors ? GxEPD_WHITE : GxEPD_BLACK;
   auto xPos = 32;
-  if (hasActivePlaymate())
+  if (idleScenes[activeIdleSceneIdx]->OffsetCreatureToLeft())
+    xPos = -5;
+  else if (hasActivePlaymate())
     xPos = 0;
 
   if (hasPoop)    

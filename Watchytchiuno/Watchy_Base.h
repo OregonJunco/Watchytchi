@@ -5,6 +5,7 @@
 #include <Watchy.h>
 #include "ArduinoNvs.h"
 #include "DebugSettings.h"
+#include <vector>
 
 #if __has_include("config.h") && __has_include(<stdint.h>)
 # include "config.h"
