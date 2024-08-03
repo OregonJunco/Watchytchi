@@ -69,7 +69,14 @@ void IdleScene_Default::DrawFG(int idleIdx)
 
 IdleScene_FloorActivity::IdleScene_FloorActivity(std::vector<const unsigned char*>* frames)
 {
-  this->frames = frames;
+  this->framesA = frames;
+  this->framesB = frames;
+}
+
+IdleScene_FloorActivity::IdleScene_FloorActivity(std::vector<const unsigned char *> *framesA, std::vector<const unsigned char *> *framesB)
+{
+  this->framesA = framesA;
+  this->framesB = framesB;
 }
 
 void IdleScene_FloorActivity::DrawBG(int idleIdx)
@@ -87,6 +94,7 @@ void IdleScene_FloorActivity::DrawFG(int idleIdx)
   owner->drawIdleCreature(idleIdx);
   if (owner->hasActivePlaymate())
     owner->drawPlaymate(idleIdx);
+  auto frames = idleIdx % 2 == 0 ? framesA : framesB;
   owner->display.drawBitmap(68, 114, frames->at(GetFrameByProgress(frames->size())), 64, 56, GxEPD_BLACK);
   
 }

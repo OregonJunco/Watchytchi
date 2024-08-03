@@ -48,7 +48,9 @@ IdleScene* idleScenes[k_numIdleScenes] =
 {
   new IdleScene_Default(),
   new IdleScene_FloorActivity(new std::vector<const unsigned char*> {img_FloorActivityProp_Blocks1, img_FloorActivityProp_Blocks2, img_FloorActivityProp_Blocks3, img_FloorActivityProp_Blocks4}),
-  new IdleScene_FloorActivity(new std::vector<const unsigned char*> {img_FloorActivityProp_Drawing1, img_FloorActivityProp_Drawing2, img_FloorActivityProp_Drawing3, img_FloorActivityProp_Drawing4}),
+  new IdleScene_FloorActivity(
+    new std::vector<const unsigned char*> {img_FloorActivityProp_DrawingA1, img_FloorActivityProp_DrawingA2, img_FloorActivityProp_DrawingA3, img_FloorActivityProp_DrawingA4},
+    new std::vector<const unsigned char*> {img_FloorActivityProp_DrawingB1, img_FloorActivityProp_DrawingB2, img_FloorActivityProp_DrawingB3, img_FloorActivityProp_DrawingB4}),
   new IdleScene_FloorActivity(new std::vector<const unsigned char*> {img_FloorActivityProp_AntHill}),
 };
 

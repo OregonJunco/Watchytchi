@@ -42,6 +42,7 @@ class IdleScene_FloorActivity : public IdleScene
 {
   public:
     IdleScene_FloorActivity(std::vector<const unsigned char*>* frames);
+    IdleScene_FloorActivity(std::vector<const unsigned char*>* framesA, std::vector<const unsigned char*>* framesB);
 
     void Tick() {IdleScene::Tick();};
     void DrawBG(int idleIdx) override;
@@ -49,7 +50,8 @@ class IdleScene_FloorActivity : public IdleScene
     bool IsEligible() {return true;};
     bool OffsetCreatureToLeft() {return true;}
   private:
-    std::vector<const unsigned char*>* frames;
+    std::vector<const unsigned char*>* framesA;
+    std::vector<const unsigned char*>* framesB;
 };
 
 // TODO: Dream, floor activity, ball, etc.
