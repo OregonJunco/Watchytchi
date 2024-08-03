@@ -43,6 +43,9 @@ class Watchytchi : public WatchyBase{
         bool hasActivePlaymate();
         int getPlaymateXOffset();
 
+        /*## Game Logic (Idle Scenes) ##*/
+        void chooseNewIdleScene();
+
         /*## Game Logic (Schedulable Events) ##*/
         bool hasActiveAlert();
         void scheduleNextAlert();

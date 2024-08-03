@@ -38,6 +38,7 @@ extern RTC_DATA_ATTR int lastUpdateTsEpoch;
 const String nvsKey_lastUpdateTsEpoch = "prevTs";
 extern RTC_DATA_ATTR int numResetPresses;
 extern RTC_DATA_ATTR int lastSaveTs;
+extern RTC_DATA_ATTR int srandSeedModifier;
 
 /*## State: UI ##*/
 extern RTC_DATA_ATTR int menuIdx;
@@ -87,7 +88,11 @@ extern RTC_DATA_ATTR int idleAnimIdx;
 extern RTC_DATA_ATTR bool isPeriodicAnim;
 extern RTC_DATA_ATTR int lastHungerCryMinute;
 extern RTC_DATA_ATTR int lastAnimateMinute;
+
+/*## State: Game State (Idle Scenes) ##*/
 extern RTC_DATA_ATTR int activeIdleSceneIdx;
+extern RTC_DATA_ATTR int lastChangeIdleSceneTs;
+extern RTC_DATA_ATTR int currentIdleSceneDuration;
 
 /*## State: Game State (Stroking) ##*/
 extern RTC_DATA_ATTR bool isStrokingLeftSide;

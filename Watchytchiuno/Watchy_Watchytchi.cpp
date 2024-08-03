@@ -43,7 +43,8 @@ const unsigned char *img_smallFontArr[10] = {
   img_smallFont_9
 };
 
-IdleScene* idleScenes[1] =
+const int k_numIdleScenes = 1;
+IdleScene* idleScenes[k_numIdleScenes] =
 {
   new IdleScene_Default() 
 };
@@ -65,7 +66,7 @@ void Watchytchi::drawWatchFace(){
   if (Watchy::RTC.rtcType == DS3231) {
     Watchy::RTC.rtc_ds.clearAlarm(DS3232RTC::ALARM_1);
   }
-  srand(makeTime(currentTime));
+  srand(makeTime(currentTime) + ++srandSeedModifier);
 
   /*# Load Data: #*/
   tryLoadSaveData(false);
@@ -90,7 +91,7 @@ void Watchytchi::handleButtonPress() {
     }
   }
   RTC.read(currentTime);
-  srand(makeTime(currentTime) + 1);
+  srand(makeTime(currentTime) + ++srandSeedModifier);
   tryLoadSaveData(false);
   // Call the active handle button press function depending on my gamestate
   auto didHandlePress = (this->*handleButtonFuncsByState[(int)gameState])(wakeupBit);
@@ -419,6 +420,10 @@ void Watchytchi::tickCreatureState()
   if (hasActivePlaymate() && lastUpdateTsEpoch > lastPlaymateJoinTs + k_playmateStayDuration)
     activePlaymate = PlaymateSpecies::NoPlaymate;
 
+  /*# Manage Idle Scene State #*/
+  if (activeIdleSceneIdx == -1 || lastUpdateTsEpoch > lastChangeIdleSceneTs + currentIdleSceneDuration)
+    chooseNewIdleScene();
+
   /*# Atrophy happiness! #*/
   auto oldHappyPercent = getHappyPercent();
 
@@ -672,6 +677,12 @@ int Watchytchi::getPlaymateXOffset()
   if (hasActivePlaymate())
     return -50;
   return 0;
+}
+
+void Watchytchi::chooseNewIdleScene()
+{
+  activeIdleSceneIdx = rand() % k_numIdleScenes;
+  idleScenes[activeIdleSceneIdx]->Begin();
 }
 
 void Watchytchi::clearCreatureBackground()
@@ -1322,7 +1333,7 @@ void Watchytchi::sharedWalk_draw()
     else
       display.drawBitmap(i * flowerWidth, 170, img_WalkingFlower_Bud, 25, 30, GxEPD_BLACK);
   }
-  srand(lastUpdateTsEpoch + 2);
+  srand(makeTime(currentTime) + ++srandSeedModifier);
 
   // Draw raw # of steps (TODO: decide whether this is debug or permanent)
   display.setFont(&FreeMonoBold9pt7b);

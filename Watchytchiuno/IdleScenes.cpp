@@ -3,6 +3,29 @@
 #include "Watchy_Watchytchi.h"
 #include "SpeciesCode.h"
 
+void IdleScene::Begin()
+{
+  // Random duration between lowest and highest
+  auto t = (rand() % 1000) / 1000.f;
+  currentIdleSceneDuration = (int)(GetDurationLowRange() + t * (GetDurationHighRange() - GetDurationLowRange()));
+  lastChangeIdleSceneTs = lastUpdateTsEpoch; 
+}
+
+void IdleScene::Tick()
+{
+
+}
+
+float IdleScene::GetDurationLowRange()
+{
+  return 1.5f * 60.f * 60.f; 
+}
+
+float IdleScene::GetDurationHighRange()
+{
+  return 3.f * 60.f * 60.f; 
+}
+
 void IdleScene_Default::DrawBG(int idleIdx)
 {
   owner->drawBgEnvironment();
@@ -23,4 +46,9 @@ void IdleScene_Default::DrawFG(int idleIdx)
 bool IdleScene_Default::IsEligible()
 {
   return true;
+}
+
+void IdleScene_Default::Tick()
+{
+  IdleScene::Tick();
 }

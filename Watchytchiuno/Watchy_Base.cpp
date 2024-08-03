@@ -6,6 +6,7 @@
 RTC_DATA_ATTR int lastUpdateTsEpoch = -1;
 RTC_DATA_ATTR int numResetPresses = 0;
 RTC_DATA_ATTR int lastSaveTs = -1;
+RTC_DATA_ATTR int srandSeedModifier = 0;
 
 /*## State: UI ##*/
 RTC_DATA_ATTR int menuIdx;
@@ -36,7 +37,11 @@ RTC_DATA_ATTR int idleAnimIdx = 0;
 RTC_DATA_ATTR bool isPeriodicAnim = false;
 RTC_DATA_ATTR int lastHungerCryMinute = -1;
 RTC_DATA_ATTR int lastAnimateMinute = 0;
-RTC_DATA_ATTR int activeIdleSceneIdx = 0;
+
+/*## State: Game State (Idle Scenes) ##*/
+RTC_DATA_ATTR int activeIdleSceneIdx = -1;
+RTC_DATA_ATTR int lastChangeIdleSceneTs = 0;
+RTC_DATA_ATTR int currentIdleSceneDuration = -1;
 
 /*## State: Game State (Stroking) ##*/
 RTC_DATA_ATTR bool isStrokingLeftSide = false;
