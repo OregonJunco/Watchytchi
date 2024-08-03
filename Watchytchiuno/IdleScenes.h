@@ -26,10 +26,10 @@ class IdleScene
 
 class IdleScene_Default : public IdleScene
 {
-  void Tick() override;
+  void Tick() {IdleScene::Tick();};
   void DrawBG(int idleIdx) override;
   void DrawFG(int idleIdx) override;
-  bool IsEligible() override;
+  bool IsEligible() {return true;};
 };
 
 // TODO: Dream, floor activity, ball, etc.

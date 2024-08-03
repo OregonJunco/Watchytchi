@@ -42,13 +42,3 @@ void IdleScene_Default::DrawFG(int idleIdx)
   if (owner->hasActivePlaymate())
     owner->drawPlaymate(idleIdx);
 }
-
-bool IdleScene_Default::IsEligible()
-{
-  return true;
-}
-
-void IdleScene_Default::Tick()
-{
-  IdleScene::Tick();
-}
