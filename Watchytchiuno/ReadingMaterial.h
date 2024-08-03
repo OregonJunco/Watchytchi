@@ -37,6 +37,25 @@ const char* txt_VersosSencillos[k_versosSencillosLength] =
   "Yo se los nombres extraños / De las yerbas y las flores, / Y de mortales engaños, / Y de sublimes dolores."
 };
 
-const int k_numReadingAssets = 3;
-const char** allReadingAssets[k_numReadingAssets] = {txt_velveteen1, txt_velveteen2, txt_VersosSencillos};
-const int allReadingAssetLengths[k_numReadingAssets] = {k_velveteenLength1, k_velveteenLength2, k_versosSencillosLength};
+const int k_internationaleLength = 14;
+const char* txt_theInternationale[k_internationaleLength] = 
+{
+"Arise, ye prisoners of starvation!\nArise, ye wretched of the Earth,",
+"For justice thunders condemnation,\nA better world's in birth;",
+"'Tis the final conflict\nLet each stand in their place\nThe Industrial Union\nShall be the human race",
+"No more tradition's chains shall bind us,\nArise ye slaves; no more in thrall!",
+"The earth shall rise on new foundations,\nwe have been naught, we shall be all",
+"We want no condescending saviors\nTo rule us from a judgment hall;",
+"we workers ask not for their favors;\nlet us consult for all",
+"To make the thief disgorge their booty\nTo free the spirit from its cell,",
+"We must ourselves decide our duty,\nWe must decide and do it well",
+"Behold them seated in their glory,\nThe kings of mine and rail and soil!",
+"What have you read in all their story,\nBut how they plundered toil?",
+"Fruits of the workers' toil are buried\nIn the strong coffers of a few",
+"In working for their restitution\nThe people will only ask their due",
+"'Tis the final conflict\nLet each stand in their place\nThe Industrial Union\nShall be the human race"
+};
+
+const int k_numReadingAssets = 4;
+const char** allReadingAssets[k_numReadingAssets] = {txt_velveteen1, txt_velveteen2, txt_VersosSencillos, txt_theInternationale};
+const int allReadingAssetLengths[k_numReadingAssets] = {k_velveteenLength1, k_velveteenLength2, k_versosSencillosLength, k_internationaleLength};
