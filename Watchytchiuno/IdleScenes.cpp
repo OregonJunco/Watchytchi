@@ -35,7 +35,7 @@ int IdleScene::GetFrameByProgress(int maxFrames)
 
 float IdleScene::GetDurationLowRange()
 {
-#if SHORT_IDLESCENES
+#if ULTRA_SHORT_IDLESCENES
   return 30.f;
 #endif
 
@@ -44,7 +44,7 @@ float IdleScene::GetDurationLowRange()
 
 float IdleScene::GetDurationHighRange()
 {
-#if SHORT_IDLESCENES
+#if ULTRA_SHORT_IDLESCENES
   return 30.f;
 #endif
   return 3.f * 60.f * 60.f; 

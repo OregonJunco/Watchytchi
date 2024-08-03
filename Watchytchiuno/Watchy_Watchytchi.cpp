@@ -426,6 +426,8 @@ void Watchytchi::tickCreatureState()
   /*# Manage Idle Scene State #*/
   if (activeIdleSceneIdx == -1 || lastUpdateTsEpoch > lastChangeIdleSceneTs + currentIdleSceneDuration)
     chooseNewIdleScene();
+  if (FORCED_ACTIVE_IDLESCENE != -1)
+    activeIdleSceneIdx = FORCED_ACTIVE_IDLESCENE;
 
   /*# Atrophy happiness! #*/
   auto oldHappyPercent = getHappyPercent();
