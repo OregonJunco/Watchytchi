@@ -683,8 +683,8 @@ bool Watchytchi::hasActivePlaymate()
 
 int Watchytchi::getPlaymateXOffset()
 {
-  if (idleScenes[activeIdleSceneIdx]->OffsetCreatureToLeft())
-    return -65;
+  if (gameState == GameState::BaseMenu && idleScenes[activeIdleSceneIdx]->OffsetCreatureToLeft())
+    return hasActivePlaymate() ? -65 : -35;
   if (hasActivePlaymate())
     return -50;
   return 0;
@@ -1271,7 +1271,7 @@ void Watchytchi::stroking_draw()
     display.drawBitmap(0, 0, img_StrokingButtonPrompt_L, 6, 46, GxEPD_BLACK);
   // If this stroke contributed to my happiness, draw a little heart
   if (strokeHappy.value < strokeHappy.max - 0.01f)
-    display.drawBitmap(125, 115, isStrokingLeftSide ? img_Emote_Hearts1 : img_Emote_Hearts2, 28, 19, GxEPD_BLACK);
+    display.drawBitmap(125 + getPlaymateXOffset(), 115, isStrokingLeftSide ? img_Emote_Hearts1 : img_Emote_Hearts2, 28, 19, GxEPD_BLACK);
   
   if (hasActivePlaymate())
     drawPlaymate(idleAnimIdx);

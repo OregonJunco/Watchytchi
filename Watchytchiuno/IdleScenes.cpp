@@ -95,6 +95,8 @@ void IdleScene_FloorActivity::DrawFG(int idleIdx)
   if (owner->hasActivePlaymate())
     owner->drawPlaymate(idleIdx);
   auto frames = idleIdx % 2 == 0 ? framesA : framesB;
-  owner->display.drawBitmap(68, 114, frames->at(GetFrameByProgress(frames->size())), 64, 56, GxEPD_BLACK);
+
+  auto xPos = owner->hasActivePlaymate() ? 68 : 68 + 30;
+  owner->display.drawBitmap(xPos, 114, frames->at(GetFrameByProgress(frames->size())), 64, 56, GxEPD_BLACK);
   
 }
