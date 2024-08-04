@@ -1339,14 +1339,17 @@ void Watchytchi::sharedWalk_draw()
   auto stepsDuringWalk = sensor.getCounter() - bmaStepsAtWalkStart;
   auto stepPercent = (float)stepsDuringWalk / k_walkStepDuration;
   const int flowerWidth = 25;
-  srand(currentTime.Day);
+
+  auto numLoops = floor(stepPercent);
+  auto loopedStepPercent = stepPercent - numLoops;
+  srand(currentTime.Day + numLoops);
   for (auto i = 0; i < 200 / flowerWidth; i++)
   {
     auto idxT = (float)(i + 1.f) / (200.f / flowerWidth);
 
     // If the player has gotten this far, draw a flower (random with day as seed for continuity)
     auto diceRoll = rand() % 3;
-    if (stepPercent >= idxT)
+    if (loopedStepPercent >= idxT)
     {
       display.drawBitmap(i * flowerWidth, 170, diceRoll == 0 ? img_WalkingFlower_1 
         : (diceRoll == 1 ? img_WalkingFlower_2 : img_WalkingFlower_3), 25, 30, GxEPD_BLACK);
@@ -1371,7 +1374,7 @@ void Watchytchi::sharedWalk_draw()
   if (newIncrementValue > lastIncrementValue)
   {
     auto happinessToAdd = walkHappy.max * 0.75f / k_walkHappyPayoutIncrements;
-    if (newIncrementValue == k_walkHappyPayoutIncrements)
+    if (floor(stepPercent) > floor(lastStepPercent))
       happinessToAdd += walkHappy.max * 0.25f; // Extra payout at the end
     walkHappy.AddTo(happinessToAdd);
 
@@ -1383,14 +1386,13 @@ void Watchytchi::sharedWalk_draw()
     }    
   }
 
-  lastStepsDuringWalkCount = stepsDuringWalk;
-
-  // Once you bloom all of the flowers, (+ margin so the player can see their work), exit the walk
-  // TODO: instead, linger on some kind of succes screen until user input
-  if (stepPercent >= 1.02f)
+  for (auto i = 0; i < numLoops; i++)
   {
-    gameState = GameState::BaseMenu;
+    auto xPos = 4 + 37 * i;
+    display.drawBitmap(xPos, 10, img_Walking_Bouquet, 37, 43, GxEPD_BLACK);
   }
+
+  lastStepsDuringWalkCount = stepsDuringWalk;
 }
 
 bool Watchytchi::sharedWalk_handleButtonPress(uint64_t wakeupBit)
