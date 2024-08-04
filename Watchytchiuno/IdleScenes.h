@@ -17,7 +17,7 @@ class IdleScene
     void Begin();
     virtual void Tick();
     virtual void DrawBG(int idleIdx) = 0;
-    virtual void DrawFG(int idleIdx) = 0;
+    virtual void DrawFG(int idleIdx, bool isAnimating) = 0;
     virtual bool IsEligible() = 0;
     virtual bool OffsetCreatureToLeft() {return false;}
   protected:
@@ -33,7 +33,7 @@ class IdleScene_Default : public IdleScene
 {
   void Tick() {IdleScene::Tick();};
   void DrawBG(int idleIdx) override;
-  void DrawFG(int idleIdx) override;
+  void DrawFG(int idleIdx, bool isAnimating) override;
   bool IsEligible() {return true;};
   bool OffsetCreatureToLeft() {return false;}
 };
@@ -46,7 +46,7 @@ class IdleScene_FloorActivity : public IdleScene
 
     void Tick() {IdleScene::Tick();};
     void DrawBG(int idleIdx) override;
-    void DrawFG(int idleIdx) override;
+    void DrawFG(int idleIdx, bool isAnimating) override;
     bool IsEligible() {return true;};
     bool OffsetCreatureToLeft() {return true;}
   private:

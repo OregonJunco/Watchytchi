@@ -59,10 +59,10 @@ void IdleScene_Default::DrawBG(int idleIdx)
     owner->drawAgeFlower();
 }
 
-void IdleScene_Default::DrawFG(int idleIdx)
+void IdleScene_Default::DrawFG(int idleIdx, bool isAnimating)
 {
   owner->drawPoop();
-  owner->drawIdleCreature(idleIdx);
+  owner->drawIdleCreature(isAnimating);
   if (owner->hasActivePlaymate())
     owner->drawPlaymate(idleIdx);
 }
@@ -88,10 +88,10 @@ void IdleScene_FloorActivity::DrawBG(int idleIdx)
     owner->drawAgeFlower();
 }
 
-void IdleScene_FloorActivity::DrawFG(int idleIdx)
+void IdleScene_FloorActivity::DrawFG(int idleIdx, bool isAnimating)
 {
   owner->drawPoop();
-  owner->drawIdleCreature(idleIdx);
+  owner->drawIdleCreature(isAnimating);
   if (owner->hasActivePlaymate())
     owner->drawPlaymate(idleIdx);
   auto frames = idleIdx % 2 == 0 ? framesA : framesB;

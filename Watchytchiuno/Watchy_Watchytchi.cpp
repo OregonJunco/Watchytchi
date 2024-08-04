@@ -1050,15 +1050,22 @@ void Watchytchi::baseMenu_draw()
     for (auto i = 0; i < numAnimFrames; i++)
     {
       isPeriodicAnim &= (i != numAnimFrames - 1);
-      scene->DrawFG(idleAnimIdx);
+      scene->DrawFG(idleAnimIdx, i != numAnimFrames - 1);
       display.display(true);
       if (i != numAnimFrames - 1)
-        clearNonUIBackground();
+      {
+        // Clear the previous frame before drawing the new one
+        // HACK: instead of manipulating the global invertColors, instead have a param in DrawFG to have the colors flip
+        invertColors = !invertColors;
+        idleAnimIdx = (idleAnimIdx + 1) % 2; // HACK: drawing the scene clear also increments idle idx so we have to balance it out
+        scene->DrawFG(idleAnimIdx, i != numAnimFrames - 1);
+        invertColors = !invertColors;
+      }
     }
     lastAnimateMinute = currentTime.Minute;
   }
   else {
-    scene->DrawFG(idleAnimIdx);
+    scene->DrawFG(idleAnimIdx, false);
   }    
 }
 
@@ -1245,6 +1252,7 @@ bool Watchytchi::statusCheck_handleButtonPress(uint64_t wakeupBit)
 
 void Watchytchi::eating_draw()
 {
+  hunger = 1.f;
   drawBgEnvironment();
   drawWeather();
   drawDebugClock();
@@ -1253,7 +1261,6 @@ void Watchytchi::eating_draw()
   
   // After drawing the eat animation, exit the eating state and draw the default screen
   gameState = GameState::BaseMenu;
-  hunger = 1.f;
   baseMenu_draw();
 }
 
