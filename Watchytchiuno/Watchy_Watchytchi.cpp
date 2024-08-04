@@ -51,7 +51,9 @@ IdleScene* idleScenes[k_numIdleScenes] =
   new IdleScene_FloorActivity(
     new std::vector<const unsigned char*> {img_FloorActivityProp_DrawingA1, img_FloorActivityProp_DrawingA2, img_FloorActivityProp_DrawingA3, img_FloorActivityProp_DrawingA4},
     new std::vector<const unsigned char*> {img_FloorActivityProp_DrawingB1, img_FloorActivityProp_DrawingB2, img_FloorActivityProp_DrawingB3, img_FloorActivityProp_DrawingB4}),
-  new IdleScene_FloorActivity(new std::vector<const unsigned char*> {img_FloorActivityProp_AntHill}),
+  new IdleScene_FloorActivity(
+    new std::vector<const unsigned char*> {img_FloorActivityProp_AntHillA},
+    new std::vector<const unsigned char*> {img_FloorActivityProp_AntHillB})
 };
 
 static float floatMap(float val, float fromLow, float fromHigh, float toLow, float toHigh, float precision = 1000.f)
