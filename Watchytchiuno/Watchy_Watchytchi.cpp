@@ -43,7 +43,7 @@ const unsigned char *img_smallFontArr[10] = {
   img_smallFont_9
 };
 
-const int k_numIdleScenes = 4;
+const int k_numIdleScenes = 5;
 IdleScene* idleScenes[k_numIdleScenes] =
 {
   new IdleScene_Default(),
@@ -53,7 +53,8 @@ IdleScene* idleScenes[k_numIdleScenes] =
     new std::vector<const unsigned char*> {img_FloorActivityProp_DrawingB1, img_FloorActivityProp_DrawingB2, img_FloorActivityProp_DrawingB3, img_FloorActivityProp_DrawingB4}),
   new IdleScene_FloorActivity(
     new std::vector<const unsigned char*> {img_FloorActivityProp_AntHillA},
-    new std::vector<const unsigned char*> {img_FloorActivityProp_AntHillB})
+    new std::vector<const unsigned char*> {img_FloorActivityProp_AntHillB}),
+  new IdleScene_Dream()
 };
 
 static float floatMap(float val, float fromLow, float fromHigh, float toLow, float toHigh, float precision = 1000.f)
@@ -428,10 +429,17 @@ void Watchytchi::tickCreatureState()
     activePlaymate = PlaymateSpecies::NoPlaymate;
 
   /*# Manage Idle Scene State #*/
+
+  for (auto i = 0; i < k_numIdleScenes; i++)
+  {
+    idleScenes[i]->owner = this;
+    idleScenes[i]->critter = critter;
+  }
   if (activeIdleSceneIdx == -1 || lastUpdateTsEpoch > lastChangeIdleSceneTs + currentIdleSceneDuration)
     chooseNewIdleScene();
-  if (FORCED_ACTIVE_IDLESCENE != -1)
-    activeIdleSceneIdx = FORCED_ACTIVE_IDLESCENE;
+  idleScenes[activeIdleSceneIdx]->owner = this;
+  if (!idleScenes[activeIdleSceneIdx]->IsEligible() && FORCED_ACTIVE_IDLESCENE == -1)
+    chooseNewIdleScene();
 
   /*# Atrophy happiness! #*/
   auto oldHappyPercent = getHappyPercent();
@@ -692,7 +700,31 @@ int Watchytchi::getPlaymateXOffset()
 
 void Watchytchi::chooseNewIdleScene()
 {
-  activeIdleSceneIdx = rand() % k_numIdleScenes;
+  if (FORCED_ACTIVE_IDLESCENE != -1)
+  {
+    activeIdleSceneIdx = FORCED_ACTIVE_IDLESCENE;
+    idleScenes[activeIdleSceneIdx]->Begin();
+    return;
+  }
+
+  // Choose a random idle scene which is currently eligible to be run!
+  auto newSceneIdx = rand() % k_numIdleScenes;
+  auto foundValidScene = false;
+  for (auto _ = 0; _ < k_numIdleScenes; _++)
+  {
+    // Don't choose the same one in a row, or ineligible scenes
+    if (newSceneIdx != activeIdleSceneIdx && idleScenes[newSceneIdx]->IsEligible())
+    {
+      foundValidScene = true;
+      break;
+    }
+    newSceneIdx = (newSceneIdx + 1) % k_numIdleScenes;
+  }
+
+  if (foundValidScene)
+    activeIdleSceneIdx = newSceneIdx;
+  else
+    activeIdleSceneIdx = 0;
   idleScenes[activeIdleSceneIdx]->Begin();
 }
 

@@ -47,11 +47,21 @@ class IdleScene_FloorActivity : public IdleScene
     void Tick() {IdleScene::Tick();};
     void DrawBG(int idleIdx) override;
     void DrawFG(int idleIdx, bool isAnimating) override;
-    bool IsEligible() {return true;};
+    bool IsEligible() override;
     bool OffsetCreatureToLeft() {return true;}
   private:
     std::vector<const unsigned char*>* framesA;
     std::vector<const unsigned char*>* framesB;
+};
+
+class IdleScene_Dream : public IdleScene
+{
+  public:
+    void Tick() {IdleScene::Tick();};
+    void DrawBG(int idleIdx) override;
+    void DrawFG(int idleIdx, bool isAnimating) override;
+    bool IsEligible() override;
+    bool OffsetCreatureToLeft(){return false;} 
 };
 
 // TODO: Dream, floor activity, ball, etc.
